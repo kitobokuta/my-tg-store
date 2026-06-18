@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jupiter Digital Store</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: var(--tg-theme-bg-color, #1a1a1a);
+            color: var(--tg-theme-text-color, #ffffff);
+            padding: 20px;
+            text-align: center;
+        }
+        .product-card {
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            background: var(--tg-theme-secondary-bg-color, #242424);
+        }
+        .btn {
+            background-color: var(--tg-theme-button-color, #22c55e);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🛒 Jupiter Mini Store</h2>
+    <p>မင်္ဂလာပါ <span id="user-name">Customer</span> 🙏</p>
+
+    <div class="product-card">
+        <h3>Outline VPN (1 Month)</h3>
+        <p>ဈေးနှုန်း - 5,000 MMK</p>
+        <button class="btn" onclick="buyProduct('Outline VPN', 5000)">ဝယ်ယူမည်</button>
+    </div>
+
+    <div class="product-card">
+        <h3>🧾 KPay Slip Upload</h3>
+        <input type="file" id="slip-file" accept="image/*" style="margin-bottom: 15px;"><br>
+        <button class="btn" style="background-color: #2481cc;" onclick="uploadSlip()">Receipt တင်ရန်</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand(); 
+
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name;
+        }
+
+        function buyProduct(name, price) {
+            alert(name + " အတွက် အော်ဒါတင်လိုက်ပါပြီ။ KPay ဖြင့် ငွေလွှဲပြီး စလစ်တင်ပေးပါ။");
+        }
+
+        function uploadSlip() {
+            const fileInput = document.getElementById('slip-file');
+            if(fileInput.files.length === 0) {
+                alert("ကျေးဇူးပြု၍ KPay စလစ်ပုံရွေးပေးပါ။");
+                return;
+            }
+            alert("စလစ်ကို အောင်မြင်စွာ တင်ပြီးပါပြီ။ Admin အတည်ပြုချက်ကို စောင့်ပါ။");
+            tg.close(); 
+        }
+    </script>
+</body>
+</html>
