@@ -30,17 +30,8 @@
             min-height: 100vh;
         }
 
-        .store-header {
-            text-align: center;
-            margin-bottom: 16px;
-            position: relative;
-        }
-        .planet-icon {
-            width: 75px;
-            height: auto;
-            margin-bottom: -12px;
-            filter: drop-shadow(0 0 12px rgba(255,255,255,0.4));
-        }
+        .store-header { text-align: center; margin-bottom: 16px; position: relative; }
+        .planet-icon { width: 75px; height: auto; margin-bottom: -12px; filter: drop-shadow(0 0 12px rgba(255,255,255,0.4)); }
         h1.store-title {
             font-family: "Cinzel", "Times New Roman", serif;
             font-size: 32px;
@@ -52,16 +43,9 @@
             -webkit-text-fill-color: transparent;
             text-shadow: 0 4px 15px rgba(0,0,0,0.8);
         }
-        .store-subtitle {
-            font-size: 10px;
-            letter-spacing: 3px;
-            color: #b0bec5;
-            text-transform: uppercase;
-            margin-top: 4px;
-            font-weight: 600;
-        }
+        .store-subtitle { font-size: 10px; letter-spacing: 3px; color: #b0bec5; text-transform: uppercase; margin-top: 4px; font-weight: 600; }
 
-        /* --- Tab Switcher Styling --- */
+        /* --- 3-Tab Switcher Styling --- */
         .tab-container {
             display: flex;
             background: #161b22;
@@ -69,14 +53,15 @@
             padding: 4px;
             border: 1px solid #30363d;
             margin-bottom: 20px;
+            gap: 4px;
         }
         .tab-btn {
             flex: 1;
-            padding: 10px 6px;
+            padding: 10px 4px;
             background: transparent;
             border: none;
             color: var(--hint-color);
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 700;
             border-radius: 8px;
             cursor: pointer;
@@ -104,7 +89,6 @@
         }
 
         .loading { text-align: center; padding: 50px 0; color: var(--hint-color); font-size: 14px; }
-        
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 30px; }
 
         .card {
@@ -124,140 +108,44 @@
         }
         .card:active { transform: scale(0.97); border-color: #58a6ff; }
 
-        .card-number {
-            position: absolute;
-            top: 8px;
-            left: 10px;
-            font-size: 11px;
-            font-weight: 800;
-            color: #8b9bb4;
-            letter-spacing: 0.5px;
-        }
-
+        .card-number { position: absolute; top: 8px; left: 10px; font-size: 11px; font-weight: 800; color: #8b9bb4; }
         .card-img-wrap {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
+            width: 60px; height: 60px; border-radius: 50%;
             background: radial-gradient(circle, #21262d 0%, #0d1117 100%);
             border: 2px solid rgba(255,255,255,0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 4px;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.1);
-            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            margin-top: 4px; margin-bottom: 10px; overflow: hidden;
         }
-        .card img {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
+        .card img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+        .card h3 { margin: 0; font-size: 13px; font-weight: 700; color: #f0f6fc; word-break: break-word; }
+        .duration { font-size: 10px; font-weight: 700; color: var(--accent-red); margin-top: 4px; }
+        .price { font-weight: 800; color: #58a6ff; margin-top: 4px; font-size: 12px; }
 
-        .card h3 {
-            margin: 0;
-            font-size: 13px;
-            font-weight: 700;
-            color: #f0f6fc;
-            word-break: break-word;
-            line-height: 1.3;
-        }
-
-        .duration { 
-            font-size: 10px; 
-            font-weight: 700; 
-            color: var(--accent-red); 
-            margin-top: 4px; 
-            letter-spacing: 0.3px;
-        }
-        .price { 
-            font-weight: 800; 
-            color: #58a6ff; 
-            margin-top: 4px; 
-            font-size: 12px; 
-        }
-
-        .card-footer-ornament {
-            margin-top: 8px;
-            font-size: 10px;
-            color: #8b9bb4;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .card-footer-ornament::before, .card-footer-ornament::after {
-            content: "—";
-            color: #30363d;
-        }
+        .card-footer-ornament { margin-top: 8px; font-size: 10px; color: #8b9bb4; display: flex; align-items: center; gap: 6px; }
+        .card-footer-ornament::before, .card-footer-ornament::after { content: "—"; color: #30363d; }
 
         .detail-view { 
-            display: none; 
-            background: linear-gradient(145deg, #161b22 0%, #0d1117 100%); 
-            padding: 24px 16px; 
-            border-radius: 16px; 
-            border: 1px solid #30363d;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            text-align: center;
+            display: none; background: linear-gradient(145deg, #161b22 0%, #0d1117 100%); 
+            padding: 24px 16px; border-radius: 16px; border: 1px solid #30363d; text-align: center;
         }
         .detail-img-wrap {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+            width: 80px; height: 80px; border-radius: 50%;
             background: radial-gradient(circle, #21262d 0%, #0d1117 100%);
-            border: 3px solid rgba(255,255,255,0.3);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.6);
-            overflow: hidden;
+            border: 3px solid rgba(255,255,255,0.3); display: inline-flex;
+            align-items: center; justify-content: center; margin-bottom: 12px; overflow: hidden;
         }
         .detail-img-wrap img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
-
-        .note-box {
-            background-color: rgba(255, 193, 7, 0.1);
-            border-left: 4px solid #ffc107;
-            color: #ffecb3;
-            padding: 12px;
-            font-size: 12px;
-            border-radius: 6px;
-            margin: 16px 0;
-            text-align: left;
-            line-height: 1.4;
-        }
-
+        .note-box { background-color: rgba(255, 193, 7, 0.1); border-left: 4px solid #ffc107; color: #ffecb3; padding: 12px; font-size: 12px; border-radius: 6px; margin: 16px 0; text-align: left; }
         .input-group { margin-top: 16px; text-align: left; }
-        .input-group label { font-size: 11px; color: var(--hint-color); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #30363d;
-            background: #0d1117;
-            color: #ffffff;
-            box-sizing: border-box;
-            font-size: 14px;
-            outline: none;
-        }
-        .input-group input:focus { border-color: #58a6ff; }
+        .input-group label { font-size: 11px; color: var(--hint-color); display: block; margin-bottom: 6px; }
+        .input-group input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #30363d; background: #0d1117; color: #ffffff; box-sizing: border-box; font-size: 14px; outline: none; }
 
         .trust-footer {
-            margin-top: 24px;
-            background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
-            border: 1px solid #30363d;
-            border-radius: 12px;
-            padding: 10px 8px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            font-size: 9px;
-            color: #8b9bb4;
-            text-align: center;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+            margin-top: 24px; background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
+            border: 1px solid #30363d; border-radius: 12px; padding: 10px 8px;
+            display: flex; justify-content: space-around; align-items: center; font-size: 9px; color: #8b9bb4; text-align: center;
         }
         .trust-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .trust-item span { font-size: 13px; }
     </style>
 </head>
 <body>
@@ -266,7 +154,6 @@
     <svg class="planet-icon" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
         <ellipse cx="100" cy="65" rx="90" ry="25" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="4" transform="rotate(-15 100 65)"/>
         <circle cx="100" cy="65" r="45" fill="url(#planetGrad)" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
-        <ellipse cx="100" cy="65" rx="90" ry="25" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="4" stroke-dasharray="100 300" transform="rotate(-15 100 65)"/>
         <defs>
             <radialGradient id="planetGrad" cx="30%" cy="30%" r="70%">
                 <stop offset="0%" stop-color="#cfd8dc"/>
@@ -279,9 +166,10 @@
     <div class="store-subtitle">✦ PREMIUM DIGITAL PRODUCTS ✦</div>
 </div>
 
-<!-- Tabs Bar -->
+<!-- Tab Switcher (3 Tabs) -->
 <div id="tabContainer" class="tab-container">
-    <button class="tab-btn active" id="tabService" onclick="switchTab('SERVICE')">Login in Service</button>
+    <button class="tab-btn active" id="tabPremium" onclick="switchTab('PREMIUM')">Premium</button>
+    <button class="tab-btn" id="tabService" onclick="switchTab('SERVICE')">Log in Service</button>
     <button class="tab-btn" id="tabGame" onclick="switchTab('GAME')">Game Item</button>
 </div>
 
@@ -324,19 +212,10 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbxcdzIBPmwGxxI5CTDyaEfe7oulF8ckk_pR1-BenxLPs2lh1wnGposGdyJOCb63o1Z4/exec";
     const QR_IMAGE_URL = "https://kitobokuta.github.io/digital-product-ui/qr.jpg";
 
-    const FALLBACK_PRODUCTS = [
-        { product_id: "P1", name: "CapCut Pro", category: "Pro 1 Month", duration: "30 Days", price: "4500", description: "Full Pro Access", logo: "", type: "SERVICE" },
-        { product_id: "P2", name: "Spotify Premium", category: "Individual 1 Month", duration: "30 Days", price: "3500", description: "Upgrade your own account", logo: "", type: "SERVICE" },
-        { product_id: "P3", name: "Canva Pro", category: "1 Year Team Invite", duration: "365 Days", price: "5000", description: "Join via team link", logo: "", type: "SERVICE" },
-        { product_id: "P4", name: "Mobile Legends", category: "86 Diamonds", duration: "Instant", price: "4000", description: "Direct Player ID Topup", logo: "", type: "GAME" },
-        { product_id: "P5", name: "PUBG Mobile", category: "60 UC", duration: "Instant", price: "3500", description: "Direct Player ID Topup", logo: "", type: "GAME" },
-        { product_id: "P6", name: "Free Fire", category: "100 Diamonds", duration: "Instant", price: "3000", description: "UID Topup", logo: "", type: "GAME" }
-    ];
-
     let rawData = [];
     let selectedProduct = null;
     let currentView = 'PRODUCTS';
-    let currentTab = 'SERVICE'; // 'SERVICE' or 'GAME'
+    let currentTab = 'PREMIUM'; // 'PREMIUM', 'SERVICE', 'GAME'
     let lastSelectedProductName = '';
 
     function getProp(obj, keys) {
@@ -354,25 +233,9 @@
         return "";
     }
 
-    // Determine if product belongs to Game or Service tab
-    function getProductTabType(prod) {
-        const explicitType = getProp(prod, ["type", "tab"]);
-        if (explicitType) {
-            if (explicitType.toUpperCase().includes("GAME")) return "GAME";
-            if (explicitType.toUpperCase().includes("SERVICE")) return "SERVICE";
-        }
-        
-        const name = (getProp(prod, ["name", "title"]) + " " + getProp(prod, ["category", "description"])).toLowerCase();
-        const gameKeywords = ["game", "diamond", "uc", "pubg", "mlbb", "mobile legends", "free fire", "roblox", "steam", "valorant", "gems", "topup"];
-        
-        for (let kw of gameKeywords) {
-            if (name.includes(kw)) return "GAME";
-        }
-        return "SERVICE";
-    }
-
     function switchTab(tabType) {
         currentTab = tabType;
+        document.getElementById('tabPremium').classList.toggle('active', tabType === 'PREMIUM');
         document.getElementById('tabService').classList.toggle('active', tabType === 'SERVICE');
         document.getElementById('tabGame').classList.toggle('active', tabType === 'GAME');
         showProducts();
@@ -395,48 +258,25 @@
 
     function resolveLogo(item, categoryName) {
         if (!item) return getSvgInitialsLogo(categoryName);
-        let logoVal = getProp(item, ["logo", "image", "img", "photo"]);
+        let logoVal = getProp(item, ["logo", "image", "img"]);
         if (logoVal !== "") {
-            if (logoVal.startsWith("http://") || logoVal.startsWith("https://") || logoVal.startsWith("data:")) {
-                return logoVal;
-            }
-            if (!logoVal.startsWith("images/")) {
-                logoVal = "images/" + logoVal;
-            }
+            if (logoVal.startsWith("http://") || logoVal.startsWith("https://") || logoVal.startsWith("data:")) return logoVal;
+            if (!logoVal.startsWith("images/")) logoVal = "images/" + logoVal;
             return logoVal;
         }
-        const titleForInitial = getProp(item, ["name", "title"]) || categoryName || "Product";
-        return getSvgInitialsLogo(titleForInitial);
+        return getSvgInitialsLogo(getProp(item, ["name", "title"]) || categoryName);
     }
 
     async function fetchProducts() {
         try {
             const timestampUrl = API_URL + (API_URL.includes("?") ? "&" : "?") + "_t=" + new Date().getTime();
             const response = await fetch(timestampUrl, { redirect: "follow" });
-            if (!response.ok) throw new Error("Network response was not ok");
-            
-            const jsonRes = await response.json();
-            
-            if (Array.isArray(jsonRes) && jsonRes.length > 0) {
-                rawData = jsonRes;
-            } else if (jsonRes && jsonRes.error) {
-                console.warn("GAS Error:", jsonRes.error);
-                rawData = FALLBACK_PRODUCTS;
-            } else {
-                rawData = FALLBACK_PRODUCTS;
-            }
-
-            if (!Array.isArray(rawData) || rawData.length === 0) {
-                rawData = FALLBACK_PRODUCTS;
-            }
-
+            rawData = await response.json();
             document.getElementById('loading').style.display = 'none';
             showProducts();
         } catch (error) {
-            console.warn("Fetch error, using fallback catalog:", error);
-            rawData = FALLBACK_PRODUCTS;
-            document.getElementById('loading').style.display = 'none';
-            showProducts();
+            console.error("Fetch error:", error);
+            document.getElementById('loading').innerHTML = "Data ရယူ၍ မရနိုင်ပါ။";
         }
     }
 
@@ -453,19 +293,20 @@
         container.innerHTML = '';
 
         const uniqueProductsMap = new Map();
-        rawData.forEach((prod) => {
-            const prodName = getProp(prod, ["name", "title"]) || '';
-            const lowerName = prodName.toLowerCase();
-            if (!prodName || 
-                lowerName.includes("supplier") || 
-                lowerName.includes("mainia") || 
-                lowerName === "name" || 
-                lowerName === "title") {
-                return;
-            }
 
-            // Tab Filter
-            if (getProductTabType(prod) === currentTab) {
+        rawData.forEach((prod) => {
+            const sheetType = getProp(prod, ["sheet_type", "type"]);
+            const prodName = getProp(prod, ["name", "title"]);
+
+            if (!prodName) return;
+
+            // Sheet Name အလိုက် Tab ခွဲခြားခြင်း
+            let isMatched = false;
+            if (currentTab === 'PREMIUM' && sheetType === "Products Master Database") isMatched = true;
+            if (currentTab === 'SERVICE' && sheetType === "Log in Service") isMatched = true;
+            if (currentTab === 'GAME' && sheetType === "Game Items") isMatched = true;
+
+            if (isMatched) {
                 if (!uniqueProductsMap.has(prodName)) {
                     uniqueProductsMap.set(prodName, prod);
                 }
@@ -509,7 +350,6 @@
             document.getElementById('productGrid').style.display = 'none';
             document.getElementById('categoryGrid').style.display = 'grid';
             document.getElementById('detailView').style.display = 'none';
-            try { tg.MainButton.hide(); } catch(e){}
 
             const container = document.getElementById('categoryGrid');
             container.innerHTML = '';
@@ -520,18 +360,16 @@
                 const itemDuration = getProp(item, ["duration", "time"]) || '';
                 const logoSrc = resolveLogo(item, itemCat);
                 const fallbackSrc = getSvgInitialsLogo(itemCat);
-                const durationHtml = itemDuration ? `<div class="duration">⏱ ${itemDuration}</div>` : '';
-                const cardNum = (index + 1) < 10 ? '0' + (index + 1) : (index + 1);
 
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <div class="card-number">${cardNum}</div>
+                    <div class="card-number">${(index + 1) < 10 ? '0' + (index + 1) : (index + 1)}</div>
                     <div class="card-img-wrap">
                         <img src="${logoSrc}" alt="${itemCat}" onerror="this.onerror=null; this.src='${fallbackSrc}';">
                     </div>
                     <h3>${itemCat}</h3>
-                    ${durationHtml}
+                    ${itemDuration ? `<div class="duration">⏱ ${itemDuration}</div>` : ''}
                     <div class="price">${itemPrice} MMK</div>
                     <div class="card-footer-ornament">👑</div>
                 `;
@@ -548,30 +386,20 @@
         document.getElementById('productGrid').style.display = 'none';
         document.getElementById('categoryGrid').style.display = 'none';
         document.getElementById('detailView').style.display = 'block';
-        document.getElementById('backBtn').style.display = 'block';
 
-        const prodName = getProp(product, ["name", "title"]) || 'Plan';
-        const prodCat = getProp(product, ["category", "cat"]) || '';
-        const prodPrice = getProp(product, ["price", "cost"]) || '0';
-        const prodDuration = getProp(product, ["duration", "time"]) || '';
-        const prodDesc = getProp(product, ["description", "desc", "note"]) || '';
+        const prodName = getProp(product, ["name", "title"]);
+        const prodCat = getProp(product, ["category", "cat"]);
+        const prodPrice = getProp(product, ["price", "cost"]);
+        const prodDuration = getProp(product, ["duration", "time"]);
+        const prodDesc = getProp(product, ["description", "desc"]);
 
-        const logoImg = document.getElementById('detailLogo');
-        const logoSrc = resolveLogo(product, prodName);
-        const fallbackSrc = getSvgInitialsLogo(prodName);
-        
-        logoImg.src = logoSrc;
-        logoImg.onerror = function() {
-            this.onerror = null;
-            this.src = fallbackSrc;
-        };
-
+        document.getElementById('detailLogo').src = resolveLogo(product, prodName);
         document.getElementById('productTitle').innerText = prodCat && prodCat !== prodName ? `${prodName} - ${prodCat}` : prodName;
         document.getElementById('productDuration').innerText = prodDuration ? `⏱ ${prodDuration}` : '';
         document.getElementById('productPrice').innerText = `${prodPrice} MMK`;
 
         const noteBox = document.getElementById('noteBox');
-        if (prodDesc && String(prodDesc).trim() !== "") {
+        if (prodDesc) {
             noteBox.innerHTML = `📌 <b>Condition / Note:</b><br>${prodDesc}`;
             noteBox.style.display = 'block';
         } else {
@@ -587,24 +415,20 @@
     }
 
     function goBack() {
-        if (currentView === 'DETAIL') {
-            showVariants(lastSelectedProductName);
-        } else if (currentView === 'VARIANTS') {
-            showProducts();
-        }
+        if (currentView === 'DETAIL') showVariants(lastSelectedProductName);
+        else if (currentView === 'VARIANTS') showProducts();
     }
 
     async function sendOrder() {
         if (!selectedProduct) return;
         
         const userInput = document.getElementById('accountData').value;
-        const prodName = getProp(selectedProduct, ["name", "title"]) || 'Plan';
-        const prodCat = getProp(selectedProduct, ["category", "cat"]) || '';
-        const prodPrice = getProp(selectedProduct, ["price", "cost"]) || '0';
-        const prodDuration = getProp(selectedProduct, ["duration", "time"]) || '';
+        const prodName = getProp(selectedProduct, ["name", "title"]);
+        const prodCat = getProp(selectedProduct, ["category", "cat"]);
+        const prodPrice = getProp(selectedProduct, ["price", "cost"]);
+        const prodDuration = getProp(selectedProduct, ["duration", "time"]);
 
-        const fullDuration = prodDuration ? ` - ${prodDuration}` : '';
-        const fullItemName = (prodCat && prodCat !== prodName) ? `${prodName} (${prodCat}${fullDuration})` : `${prodName}${fullDuration}`;
+        const fullItemName = `${prodName} (${prodCat}${prodDuration ? ' - ' + prodDuration : ''})`;
         const orderId = `ORD-${Math.floor(100000000 + Math.random() * 900000000)}`;
 
         const user = tg.initDataUnsafe?.user;
@@ -628,22 +452,17 @@
                         parse_mode: 'HTML'
                     })
                 });
-            } catch (err) {
-                console.error("Direct API Photo Error:", err);
-            }
+            } catch (err){}
         }
 
         try {
-            const payload = {
+            tg.sendData(JSON.stringify({
                 order_id: orderId,
                 full_item_name: fullItemName,
                 price: prodPrice,
                 customer_note: userInput || "-"
-            };
-            tg.sendData(JSON.stringify(payload));
-        } catch (e) {
-            console.error("sendData Error:", e);
-        }
+            }));
+        } catch (e){}
 
         try { tg.close(); } catch(e){}
     }
