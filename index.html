@@ -45,13 +45,13 @@
         }
         .store-subtitle { font-size: 10px; letter-spacing: 3px; color: #b0bec5; text-transform: uppercase; margin-top: 4px; font-weight: 600; }
 
-        /* --- 3-Tab Switcher Styling --- */
+        /* --- Stylish Theme-Matching Tab Switcher --- */
         .tab-container {
             display: flex;
-            background: #161b22;
+            background: #0f172a;
             border-radius: 12px;
             padding: 4px;
-            border: 1px solid #30363d;
+            border: 1px solid #1e293b;
             margin-bottom: 20px;
             gap: 4px;
         }
@@ -65,13 +65,16 @@
             font-weight: 700;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             text-align: center;
         }
+        /* Active Tab - Space Blue/Silver Accent Theme */
         .tab-btn.active {
-            background: linear-gradient(145deg, #238636 0%, #2ea043 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             color: #ffffff;
-            box-shadow: 0 4px 12px rgba(46, 160, 67, 0.3);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            border: 1px solid rgba(147, 197, 253, 0.5);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
 
         .back-btn {
@@ -168,9 +171,9 @@
 
 <!-- Tab Switcher (3 Tabs) -->
 <div id="tabContainer" class="tab-container">
-    <button class="tab-btn active" id="tabPremium" onclick="switchTab('Products Master Database')">Premium</button>
-    <button class="tab-btn" id="tabService" onclick="switchTab('Log in Service')">Log in Service</button>
-    <button class="tab-btn" id="tabGame" onclick="switchTab('Game Items')">Game Top Up</button>
+    <button class="tab-btn active" id="tabPremium" onclick="switchTab('PREMIUM')">Premium</button>
+    <button class="tab-btn" id="tabService" onclick="switchTab('SERVICE')">Log in Service</button>
+    <button class="tab-btn" id="tabGame" onclick="switchTab('GAME')">Game Item</button>
 </div>
 
 <button id="backBtn" class="back-btn" onclick="goBack()">← Back</button>
@@ -209,13 +212,13 @@
     try { tg.expand(); } catch(e){}
 
     const BOT_TOKEN = "8872507193:AAFzPJBbCG2pjLtBDvtSakBUqEYKLbHdGks";
-    const API_URL = "https://script.google.com/macros/s/AKfycbza9QWfmQBSTiCynzg5XR3-bHwv9OXraPr53fdC8ixW3StWzC6aXL-wa-T9phl8xWbV/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxcdzIBPmwGxxI5CTDyaEfe7oulF8ckk_pR1-BenxLPs2lh1wnGposGdyJOCb63o1Z4/exec";
     const QR_IMAGE_URL = "https://kitobokuta.github.io/digital-product-ui/qr.jpg";
 
     let rawData = [];
     let selectedProduct = null;
     let currentView = 'PRODUCTS';
-    let currentTab = 'PREMIUM'; // 'PREMIUM', 'SERVICE', 'GAME'
+    let currentTab = 'PREMIUM';
     let lastSelectedProductName = '';
 
     function getProp(obj, keys) {
@@ -276,7 +279,7 @@
             showProducts();
         } catch (error) {
             console.error("Fetch error:", error);
-            document.getElementById('loading').innerHTML = "Data ရယူ၍ မရနိုင်ပါ။";
+            document.getElementById('loading').innerHTML = "Data ရယူ၍ မရနိုင်ပါ။ (Apps Script Deploy ပြန်လုပ်ပေးရန် လိုအပ်နိုင်ပါသည်)";
         }
     }
 
@@ -300,7 +303,6 @@
 
             if (!prodName) return;
 
-            // Sheet Name အလိုက် Tab ခွဲခြားခြင်း
             let isMatched = false;
             if (currentTab === 'PREMIUM' && sheetType === "Products Master Database") isMatched = true;
             if (currentTab === 'SERVICE' && sheetType === "Log in Service") isMatched = true;
