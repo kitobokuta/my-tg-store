@@ -32,7 +32,7 @@
 
         .store-header {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             position: relative;
         }
         .planet-icon {
@@ -61,6 +61,34 @@
             font-weight: 600;
         }
 
+        /* --- Tab Switcher Styling --- */
+        .tab-container {
+            display: flex;
+            background: #161b22;
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid #30363d;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px 6px;
+            background: transparent;
+            border: none;
+            color: var(--hint-color);
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .tab-btn.active {
+            background: linear-gradient(145deg, #238636 0%, #2ea043 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(46, 160, 67, 0.3);
+        }
+
         .back-btn {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.25);
@@ -75,38 +103,8 @@
             backdrop-filter: blur(5px);
         }
 
-        /* Loading & Error Styles */
-        .loading-box {
-            text-align: center;
-            padding: 40px 20px;
-            background: rgba(22, 27, 34, 0.8);
-            border: 1px solid #30363d;
-            border-radius: 14px;
-            color: var(--hint-color);
-            font-size: 14px;
-        }
-        .spinner {
-            width: 36px;
-            height: 36px;
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top: 3px solid #58a6ff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 12px auto;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .retry-btn {
-            background: #238636;
-            color: #white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            margin-top: 12px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
+        .loading { text-align: center; padding: 50px 0; color: var(--hint-color); font-size: 14px; }
+        
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 30px; }
 
         .card {
@@ -244,21 +242,6 @@
         }
         .input-group input:focus { border-color: #58a6ff; }
 
-        .submit-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #2481cc 0%, #1a5f96 100%);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            margin-top: 16px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(36, 129, 204, 0.4);
-        }
-        .submit-btn:active { transform: scale(0.98); }
-
         .trust-footer {
             margin-top: 24px;
             background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
@@ -296,15 +279,16 @@
     <div class="store-subtitle">✦ PREMIUM DIGITAL PRODUCTS ✦</div>
 </div>
 
-<button id="backBtn" class="back-btn" onclick="goBack()">← Back</button>
-
-<!-- Dynamic Status Box -->
-<div id="loadingBox" class="loading-box">
-    <div class="spinner"></div>
-    <div>Loading...</div>
+<!-- Tabs Bar -->
+<div id="tabContainer" class="tab-container">
+    <button class="tab-btn active" id="tabService" onclick="switchTab('SERVICE')">Login in Service</button>
+    <button class="tab-btn" id="tabGame" onclick="switchTab('GAME')">Game Item</button>
 </div>
 
-<div id="productGrid" class="grid" style="display: none;"></div>
+<button id="backBtn" class="back-btn" onclick="goBack()">← Back</button>
+<div id="loading" class="loading">Loading products from Google Sheet...</div>
+
+<div id="productGrid" class="grid"></div>
 <div id="categoryGrid" class="grid" style="display: none;"></div>
 
 <div id="detailView" class="detail-view">
@@ -323,8 +307,6 @@
         <label for="accountData">Account ID / Email / Phone / Remarks:</label>
         <input type="text" id="accountData" placeholder="ဝယ်ယူမည့် အကောင့်အချက်အလက်ထည့်ပါ...">
     </div>
-
-    <button id="webSubmitBtn" class="submit-btn" style="display: none;" onclick="sendOrder()">ORDER NOW</button>
 </div>
 
 <div class="trust-footer">
@@ -335,21 +317,67 @@
 </div>
 
 <script>
-    // GOOGLE APPS SCRIPT WEB APP URL
-    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwuWeGiAwzGwqTTjpUjSBsXHqmwuXBsmFLUtIeLXGFnWd2jPOJp9nlolBBLuON6CEiu/exec";
+    const tg = window.Telegram.WebApp;
+    try { tg.expand(); } catch(e){}
 
-    let productsDatabase = [];
+    const BOT_TOKEN = "8872507193:AAFzPJBbCG2pjLtBDvtSakBUqEYKLbHdGks";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxcdzIBPmwGxxI5CTDyaEfe7oulF8ckk_pR1-BenxLPs2lh1wnGposGdyJOCb63o1Z4/exec";
+    const QR_IMAGE_URL = "https://kitobokuta.github.io/digital-product-ui/qr.jpg";
+
+    const FALLBACK_PRODUCTS = [
+        { product_id: "P1", name: "CapCut Pro", category: "Pro 1 Month", duration: "30 Days", price: "4500", description: "Full Pro Access", logo: "", type: "SERVICE" },
+        { product_id: "P2", name: "Spotify Premium", category: "Individual 1 Month", duration: "30 Days", price: "3500", description: "Upgrade your own account", logo: "", type: "SERVICE" },
+        { product_id: "P3", name: "Canva Pro", category: "1 Year Team Invite", duration: "365 Days", price: "5000", description: "Join via team link", logo: "", type: "SERVICE" },
+        { product_id: "P4", name: "Mobile Legends", category: "86 Diamonds", duration: "Instant", price: "4000", description: "Direct Player ID Topup", logo: "", type: "GAME" },
+        { product_id: "P5", name: "PUBG Mobile", category: "60 UC", duration: "Instant", price: "3500", description: "Direct Player ID Topup", logo: "", type: "GAME" },
+        { product_id: "P6", name: "Free Fire", category: "100 Diamonds", duration: "Instant", price: "3000", description: "UID Topup", logo: "", type: "GAME" }
+    ];
+
+    let rawData = [];
+    let selectedProduct = null;
     let currentView = 'PRODUCTS';
+    let currentTab = 'SERVICE'; // 'SERVICE' or 'GAME'
     let lastSelectedProductName = '';
-    let selectedProductData = null;
 
-    // Telegram WebApp Handling
-    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-    if (tg) {
-        try { tg.expand(); tg.ready(); } catch(e){}
+    function getProp(obj, keys) {
+        if (!obj) return "";
+        for (let k of keys) {
+            for (let prop in obj) {
+                if (prop.toLowerCase() === k.toLowerCase()) {
+                    let val = obj[prop];
+                    if (val !== undefined && val !== null && String(val).trim() !== "") {
+                        return String(val).trim();
+                    }
+                }
+            }
+        }
+        return "";
     }
 
-    // Dynamic Initial Logo Generator
+    // Determine if product belongs to Game or Service tab
+    function getProductTabType(prod) {
+        const explicitType = getProp(prod, ["type", "tab"]);
+        if (explicitType) {
+            if (explicitType.toUpperCase().includes("GAME")) return "GAME";
+            if (explicitType.toUpperCase().includes("SERVICE")) return "SERVICE";
+        }
+        
+        const name = (getProp(prod, ["name", "title"]) + " " + getProp(prod, ["category", "description"])).toLowerCase();
+        const gameKeywords = ["game", "diamond", "uc", "pubg", "mlbb", "mobile legends", "free fire", "roblox", "steam", "valorant", "gems", "topup"];
+        
+        for (let kw of gameKeywords) {
+            if (name.includes(kw)) return "GAME";
+        }
+        return "SERVICE";
+    }
+
+    function switchTab(tabType) {
+        currentTab = tabType;
+        document.getElementById('tabService').classList.toggle('active', tabType === 'SERVICE');
+        document.getElementById('tabGame').classList.toggle('active', tabType === 'GAME');
+        showProducts();
+    }
+
     function getSvgInitialsLogo(text) {
         const initial = (text || "J").trim().charAt(0).toUpperCase();
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
@@ -365,203 +393,262 @@
         return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
     }
 
-    // Helper: Safely Map Fields from Google Sheet Response
-    function normalizeItem(raw) {
-        return {
-            id: raw.id || raw.ID || raw.code || raw.Code || "PROD-" + Math.floor(Math.random()*10000),
-            name: raw.name || raw.Name || raw.product_name || raw.Item || raw.item || "Unknown Product",
-            type: raw.type || raw.Type || raw.category || raw.Category || "Standard",
-            duration: raw.duration || raw.Duration || raw.Plan || "N/A",
-            priceText: raw.priceText || raw.price || raw.Price || raw.price_text || (raw.sellingPrice ? raw.sellingPrice + " MMK" : "0 MMK"),
-            costPrice: raw.costPrice || raw.cost_price || raw.CostPrice || raw.cost || 0,
-            note: raw.note || raw.Note || raw.condition || raw.Remark || raw.remark || "-"
-        };
+    function resolveLogo(item, categoryName) {
+        if (!item) return getSvgInitialsLogo(categoryName);
+        let logoVal = getProp(item, ["logo", "image", "img", "photo"]);
+        if (logoVal !== "") {
+            if (logoVal.startsWith("http://") || logoVal.startsWith("https://") || logoVal.startsWith("data:")) {
+                return logoVal;
+            }
+            if (!logoVal.startsWith("images/")) {
+                logoVal = "images/" + logoVal;
+            }
+            return logoVal;
+        }
+        const titleForInitial = getProp(item, ["name", "title"]) || categoryName || "Product";
+        return getSvgInitialsLogo(titleForInitial);
     }
 
-    // Fetch Products from Google Sheet API
-    async function loadProductsFromSheet() {
-        const loadingBox = document.getElementById('loadingBox');
-        loadingBox.style.display = 'block';
-        loadingBox.innerHTML = `
-            <div class="spinner"></div>
-            <div>Loading...</div>
-        `;
-
+    async function fetchProducts() {
         try {
-            const response = await fetch(SHEET_API_URL);
-            if (!response.ok) throw new Error("HTTP Error: " + response.status);
-
-            const data = await response.json();
+            const timestampUrl = API_URL + (API_URL.includes("?") ? "&" : "?") + "_t=" + new Date().getTime();
+            const response = await fetch(timestampUrl, { redirect: "follow" });
+            if (!response.ok) throw new Error("Network response was not ok");
             
-            // Handle array directly or wrapped in data property
-            const rawList = Array.isArray(data) ? data : (data.products || data.data || []);
+            const jsonRes = await response.json();
             
-            if (rawList.length === 0) {
-                loadingBox.innerHTML = `<div>Warning:Error!</div>`;
-                return;
+            if (Array.isArray(jsonRes) && jsonRes.length > 0) {
+                rawData = jsonRes;
+            } else if (jsonRes && jsonRes.error) {
+                console.warn("GAS Error:", jsonRes.error);
+                rawData = FALLBACK_PRODUCTS;
+            } else {
+                rawData = FALLBACK_PRODUCTS;
             }
 
-            productsDatabase = rawList.map(item => normalizeItem(item));
-            loadingBox.style.display = 'none';
-            renderMainProducts();
+            if (!Array.isArray(rawData) || rawData.length === 0) {
+                rawData = FALLBACK_PRODUCTS;
+            }
 
+            document.getElementById('loading').style.display = 'none';
+            showProducts();
         } catch (error) {
-            console.error("Fetch Error:", error);
-            loadingBox.innerHTML = `
-                <div style="color: #ff4757; font-weight: bold; margin-bottom: 8px;">Data ရယူ၍ မရရှိပါ!</div>
-                <div style="font-size: 12px;">Please check your network!</div>
-                <button class="retry-btn" onclick="loadProductsFromSheet()">Try agian!</button>
-            `;
+            console.warn("Fetch error, using fallback catalog:", error);
+            rawData = FALLBACK_PRODUCTS;
+            document.getElementById('loading').style.display = 'none';
+            showProducts();
         }
     }
 
-    function renderMainProducts() {
+    function showProducts() {
         currentView = 'PRODUCTS';
+        document.getElementById('tabContainer').style.display = 'flex';
         document.getElementById('backBtn').style.display = 'none';
         document.getElementById('productGrid').style.display = 'grid';
         document.getElementById('categoryGrid').style.display = 'none';
         document.getElementById('detailView').style.display = 'none';
+        try { tg.MainButton.hide(); } catch(e){}
 
-        if (tg && tg.MainButton) tg.MainButton.hide();
+        const container = document.getElementById('productGrid');
+        container.innerHTML = '';
 
-        const grid = document.getElementById('productGrid');
-        grid.innerHTML = '';
+        const uniqueProductsMap = new Map();
+        rawData.forEach((prod) => {
+            const prodName = getProp(prod, ["name", "title"]) || '';
+            const lowerName = prodName.toLowerCase();
+            if (!prodName || 
+                lowerName.includes("supplier") || 
+                lowerName.includes("mainia") || 
+                lowerName === "name" || 
+                lowerName === "title") {
+                return;
+            }
 
-        const uniqueNames = [...new Set(productsDatabase.map(p => p.name))];
+            // Tab Filter
+            if (getProductTabType(prod) === currentTab) {
+                if (!uniqueProductsMap.has(prodName)) {
+                    uniqueProductsMap.set(prodName, prod);
+                }
+            }
+        });
 
-        uniqueNames.forEach((name, index) => {
+        if (uniqueProductsMap.size === 0) {
+            container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--hint-color); padding: 30px;">ယခု Tab တွင် ပစ္စည်းများ မရှိသေးပါ။</div>`;
+            return;
+        }
+
+        let index = 1;
+        uniqueProductsMap.forEach((prod, prodName) => {
+            const logoSrc = resolveLogo(prod, prodName);
+            const fallbackSrc = getSvgInitialsLogo(prodName);
+
             const card = document.createElement('div');
             card.className = 'card';
-            card.onclick = () => showVariants(name);
-
-            const cardNum = (index + 1) < 10 ? '0' + (index + 1) : (index + 1);
-            const logoSrc = getSvgInitialsLogo(name);
-
             card.innerHTML = `
-                <div class="card-number">${cardNum}</div>
+                <div class="card-number">${index < 10 ? '0' + index : index}</div>
                 <div class="card-img-wrap">
-                    <img src="${logoSrc}" alt="${name}">
+                    <img src="${logoSrc}" alt="${prodName}" onerror="this.onerror=null; this.src='${fallbackSrc}';">
                 </div>
-                <h3>${name}</h3>
+                <h3>${prodName}</h3>
                 <div class="card-footer-ornament">👑</div>
             `;
-            grid.appendChild(card);
+            card.onclick = () => showVariants(prodName);
+            container.appendChild(card);
+            index++;
         });
     }
 
-    function showVariants(productName) {
+    function showVariants(prodName) {
         currentView = 'VARIANTS';
-        lastSelectedProductName = productName;
+        lastSelectedProductName = prodName;
+        const matchedItems = rawData.filter(i => getProp(i, ["name", "title"]) === prodName);
 
-        document.getElementById('backBtn').style.display = 'block';
-        document.getElementById('productGrid').style.display = 'none';
-        document.getElementById('categoryGrid').style.display = 'grid';
-        document.getElementById('detailView').style.display = 'none';
+        if (matchedItems.length > 0) {
+            document.getElementById('tabContainer').style.display = 'none';
+            document.getElementById('backBtn').style.display = 'block';
+            document.getElementById('productGrid').style.display = 'none';
+            document.getElementById('categoryGrid').style.display = 'grid';
+            document.getElementById('detailView').style.display = 'none';
+            try { tg.MainButton.hide(); } catch(e){}
 
-        if (tg && tg.MainButton) tg.MainButton.hide();
+            const container = document.getElementById('categoryGrid');
+            container.innerHTML = '';
 
-        const container = document.getElementById('categoryGrid');
-        container.innerHTML = '';
+            matchedItems.forEach((item, index) => {
+                const itemCat = getProp(item, ["category", "cat"]) || prodName;
+                const itemPrice = getProp(item, ["price", "cost"]) || '0';
+                const itemDuration = getProp(item, ["duration", "time"]) || '';
+                const logoSrc = resolveLogo(item, itemCat);
+                const fallbackSrc = getSvgInitialsLogo(itemCat);
+                const durationHtml = itemDuration ? `<div class="duration">⏱ ${itemDuration}</div>` : '';
+                const cardNum = (index + 1) < 10 ? '0' + (index + 1) : (index + 1);
 
-        const matchedItems = productsDatabase.filter(p => p.name === productName);
-
-        matchedItems.forEach((item, index) => {
-            const cardNum = (index + 1) < 10 ? '0' + (index + 1) : (index + 1);
-            const logoSrc = getSvgInitialsLogo(item.name);
-
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="card-number">${cardNum}</div>
-                <div class="card-img-wrap">
-                    <img src="${logoSrc}" alt="${item.type}">
-                </div>
-                <h3>${item.type}</h3>
-                <div class="duration">⏱ ${item.duration}</div>
-                <div class="price">${item.priceText}</div>
-                <div class="card-footer-ornament">👑</div>
-            `;
-            card.onclick = () => showDetail(item);
-            container.appendChild(card);
-        });
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-number">${cardNum}</div>
+                    <div class="card-img-wrap">
+                        <img src="${logoSrc}" alt="${itemCat}" onerror="this.onerror=null; this.src='${fallbackSrc}';">
+                    </div>
+                    <h3>${itemCat}</h3>
+                    ${durationHtml}
+                    <div class="price">${itemPrice} MMK</div>
+                    <div class="card-footer-ornament">👑</div>
+                `;
+                card.onclick = () => showDetail(item);
+                container.appendChild(card);
+            });
+        }
     }
 
     function showDetail(product) {
         currentView = 'DETAIL';
-        selectedProductData = product;
-
+        selectedProduct = product;
+        document.getElementById('tabContainer').style.display = 'none';
         document.getElementById('productGrid').style.display = 'none';
         document.getElementById('categoryGrid').style.display = 'none';
         document.getElementById('detailView').style.display = 'block';
         document.getElementById('backBtn').style.display = 'block';
 
-        const logoImg = document.getElementById('detailLogo');
-        logoImg.src = getSvgInitialsLogo(product.name);
+        const prodName = getProp(product, ["name", "title"]) || 'Plan';
+        const prodCat = getProp(product, ["category", "cat"]) || '';
+        const prodPrice = getProp(product, ["price", "cost"]) || '0';
+        const prodDuration = getProp(product, ["duration", "time"]) || '';
+        const prodDesc = getProp(product, ["description", "desc", "note"]) || '';
 
-        document.getElementById('productTitle').innerText = `${product.name} - ${product.type}`;
-        document.getElementById('productDuration').innerText = `⏱ ${product.duration}`;
-        document.getElementById('productPrice').innerText = product.priceText;
+        const logoImg = document.getElementById('detailLogo');
+        const logoSrc = resolveLogo(product, prodName);
+        const fallbackSrc = getSvgInitialsLogo(prodName);
+        
+        logoImg.src = logoSrc;
+        logoImg.onerror = function() {
+            this.onerror = null;
+            this.src = fallbackSrc;
+        };
+
+        document.getElementById('productTitle').innerText = prodCat && prodCat !== prodName ? `${prodName} - ${prodCat}` : prodName;
+        document.getElementById('productDuration').innerText = prodDuration ? `⏱ ${prodDuration}` : '';
+        document.getElementById('productPrice').innerText = `${prodPrice} MMK`;
 
         const noteBox = document.getElementById('noteBox');
-        if (product.note && product.note !== "-") {
-            noteBox.innerHTML = `📌 <b>Condition / Note:</b><br>${product.note}`;
+        if (prodDesc && String(prodDesc).trim() !== "") {
+            noteBox.innerHTML = `📌 <b>Condition / Note:</b><br>${prodDesc}`;
             noteBox.style.display = 'block';
         } else {
             noteBox.style.display = 'none';
         }
 
-        if (tg && tg.MainButton) {
-            document.getElementById('webSubmitBtn').style.display = 'none';
-            tg.MainButton.setText(`ORDER NOW (${product.priceText})`);
+        try {
+            tg.MainButton.setText(`ORDER NOW (${prodPrice} MMK)`);
             tg.MainButton.show();
             tg.MainButton.offClick(sendOrder);
             tg.MainButton.onClick(sendOrder);
-        } else {
-            const webBtn = document.getElementById('webSubmitBtn');
-            webBtn.innerText = `ORDER NOW (${product.priceText})`;
-            webBtn.style.display = 'block';
-        }
+        } catch(e){}
     }
 
     function goBack() {
         if (currentView === 'DETAIL') {
             showVariants(lastSelectedProductName);
         } else if (currentView === 'VARIANTS') {
-            renderMainProducts();
+            showProducts();
         }
     }
 
-    function sendOrder() {
-        if (!selectedProductData) return;
+    async function sendOrder() {
+        if (!selectedProduct) return;
+        
+        const userInput = document.getElementById('accountData').value;
+        const prodName = getProp(selectedProduct, ["name", "title"]) || 'Plan';
+        const prodCat = getProp(selectedProduct, ["category", "cat"]) || '';
+        const prodPrice = getProp(selectedProduct, ["price", "cost"]) || '0';
+        const prodDuration = getProp(selectedProduct, ["duration", "time"]) || '';
 
-        const userInput = document.getElementById('accountData').value.trim() || "-";
+        const fullDuration = prodDuration ? ` - ${prodDuration}` : '';
+        const fullItemName = (prodCat && prodCat !== prodName) ? `${prodName} (${prodCat}${fullDuration})` : `${prodName}${fullDuration}`;
         const orderId = `ORD-${Math.floor(100000000 + Math.random() * 900000000)}`;
 
-        const orderData = {
-            order_id: orderId,
-            full_item_name: `${selectedProductData.name} - ${selectedProductData.type} (${selectedProductData.duration})`,
-            price: String(selectedProductData.priceText).replace(/[^0-9]/g, ''),
-            cost_price: selectedProductData.costPrice,
-            product_note: selectedProductData.note,
-            customer_note: userInput
-        };
+        const user = tg.initDataUnsafe?.user;
+        const chatId = user?.id;
 
-        if (tg && tg.sendData) {
+        const captionText = `🛒 <b>Order ID:</b> <code>${orderId}</code>\n` +
+                            `<b>Item:</b> ${fullItemName}\n` +
+                            `<b>Price:</b> ${prodPrice} MMK\n` +
+                            `<b>Account/Note:</b> ${userInput || '-'}\n\n` +
+                            `📷 <b>ငွေလွှဲပြေစာ နှင့်တကွ နောက်ဆုံး ဂဏန်း ၆ လုံးကို ပို့ပေးပါခဗျာ။</b>`;
+
+        if (chatId) {
             try {
-                tg.sendData(JSON.stringify(orderData));
-                tg.close();
-            } catch(e) {
-                console.error("Telegram sendData error:", e);
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        photo: QR_IMAGE_URL,
+                        caption: captionText,
+                        parse_mode: 'HTML'
+                    })
+                });
+            } catch (err) {
+                console.error("Direct API Photo Error:", err);
             }
-        } else {
-            alert("Order Submitted (Browser Preview):\n\n" + JSON.stringify(orderData, null, 2));
         }
+
+        try {
+            const payload = {
+                order_id: orderId,
+                full_item_name: fullItemName,
+                price: prodPrice,
+                customer_note: userInput || "-"
+            };
+            tg.sendData(JSON.stringify(payload));
+        } catch (e) {
+            console.error("sendData Error:", e);
+        }
+
+        try { tg.close(); } catch(e){}
     }
 
-    // Init App & Fetch Data on Load
-    window.addEventListener("DOMContentLoaded", () => {
-        loadProductsFromSheet();
-    });
+    fetchProducts();
 </script>
 </body>
-</html> 
+</html>
