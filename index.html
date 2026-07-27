@@ -2,7 +2,7 @@
 <html lang="my">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>Jupiter Store</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -25,16 +25,16 @@
             background-position: 0 0, 40px 60px, 130px 270px;
             color: var(--text-color);
             margin: 0;
-            padding: 16px;
+            padding: 12px;
             box-sizing: border-box;
             min-height: 100vh;
         }
 
         .store-header { text-align: center; margin-bottom: 16px; position: relative; }
-        .planet-icon { width: 75px; height: auto; margin-bottom: -12px; filter: drop-shadow(0 0 12px rgba(255,255,255,0.4)); }
+        .planet-icon { width: 65px; height: auto; margin-bottom: -10px; filter: drop-shadow(0 0 12px rgba(255,255,255,0.4)); }
         h1.store-title {
             font-family: "Cinzel", "Times New Roman", serif;
-            font-size: 32px;
+            font-size: 26px;
             font-weight: 900;
             letter-spacing: 2px;
             margin: 0;
@@ -43,21 +43,23 @@
             -webkit-text-fill-color: transparent;
             text-shadow: 0 4px 15px rgba(0,0,0,0.8);
         }
-        .store-subtitle { font-size: 10px; letter-spacing: 3px; color: #b0bec5; text-transform: uppercase; margin-top: 4px; font-weight: 600; }
+        .store-subtitle { font-size: 9px; letter-spacing: 2px; color: #b0bec5; text-transform: uppercase; margin-top: 4px; font-weight: 600; }
 
-        /* --- Stylish Theme-Matching Tab Switcher --- */
+        /* --- Tab Switcher --- */
         .tab-container {
             display: flex;
+            width: 100%;
             background: #0f172a;
             border-radius: 12px;
-            padding: 4px;
+            padding: 3px;
             border: 1px solid #1e293b;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             gap: 4px;
+            box-sizing: border-box;
         }
         .tab-btn {
             flex: 1;
-            padding: 10px 4px;
+            padding: 10px 2px;
             background: transparent;
             border: none;
             color: var(--hint-color);
@@ -65,14 +67,14 @@
             font-weight: 700;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             text-align: center;
+            white-space: nowrap;
         }
-        /* Active Tab - Space Blue/Silver Accent Theme */
         .tab-btn.active {
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             color: #ffffff;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
             border: 1px solid rgba(147, 197, 253, 0.5);
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
@@ -81,72 +83,101 @@
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.25);
             color: #ffffff;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             padding: 8px 16px;
             border-radius: 20px;
             margin-bottom: 16px;
             display: none;
-            font-weight: 500;
+            font-weight: 600;
             backdrop-filter: blur(5px);
         }
 
-        .loading { text-align: center; padding: 50px 0; color: var(--hint-color); font-size: 14px; }
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 30px; }
+        .loading { text-align: center; padding: 40px 0; color: var(--hint-color); font-size: 13px; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 24px; }
 
         .card {
             position: relative;
             background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
-            border-radius: 14px;
-            padding: 18px 10px;
+            border-radius: 12px;
+            padding: 14px 8px;
             text-align: center;
             cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15);
             border: 1px solid #30363d;
-            transition: transform 0.15s ease, border-color 0.15s ease;
+            transition: transform 0.15s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            box-sizing: border-box;
         }
-        .card:active { transform: scale(0.97); border-color: #58a6ff; }
+        .card:active { transform: scale(0.96); border-color: #58a6ff; }
 
-        .card-number { position: absolute; top: 8px; left: 10px; font-size: 11px; font-weight: 800; color: #8b9bb4; }
+        /* Inactive Card Styling */
+        .card.is-inactive {
+            opacity: 0.6;
+            filter: grayscale(0.6);
+        }
+        .unavailable-badge {
+            background: #ff4757;
+            color: #ffffff;
+            font-size: 8px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-top: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .card-number { position: absolute; top: 6px; left: 8px; font-size: 10px; font-weight: 800; color: #8b9bb4; }
         .card-img-wrap {
-            width: 60px; height: 60px; border-radius: 50%;
+            width: 54px; height: 54px; border-radius: 50%;
             background: radial-gradient(circle, #21262d 0%, #0d1117 100%);
-            border: 2px solid rgba(255,255,255,0.25);
+            border: 2px solid rgba(255,255,255,0.2);
             display: flex; align-items: center; justify-content: center;
-            margin-top: 4px; margin-bottom: 10px; overflow: hidden;
+            margin-top: 4px; margin-bottom: 8px; overflow: hidden;
         }
-        .card img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
-        .card h3 { margin: 0; font-size: 13px; font-weight: 700; color: #f0f6fc; word-break: break-word; }
+        .card img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .card h3 { margin: 0; font-size: 12px; font-weight: 700; color: #f0f6fc; word-break: break-word; line-height: 1.2; }
         .duration { font-size: 10px; font-weight: 700; color: var(--accent-red); margin-top: 4px; }
-        .price { font-weight: 800; color: #58a6ff; margin-top: 4px; font-size: 12px; }
+        .price { font-weight: 800; color: #58a6ff; margin-top: 4px; font-size: 11px; }
 
-        .card-footer-ornament { margin-top: 8px; font-size: 10px; color: #8b9bb4; display: flex; align-items: center; gap: 6px; }
+        .card-footer-ornament { margin-top: 6px; font-size: 9px; color: #8b9bb4; display: flex; align-items: center; gap: 4px; }
         .card-footer-ornament::before, .card-footer-ornament::after { content: "—"; color: #30363d; }
 
         .detail-view { 
             display: none; background: linear-gradient(145deg, #161b22 0%, #0d1117 100%); 
-            padding: 24px 16px; border-radius: 16px; border: 1px solid #30363d; text-align: center;
+            padding: 20px 14px; border-radius: 14px; border: 1px solid #30363d; text-align: center;
         }
         .detail-img-wrap {
-            width: 80px; height: 80px; border-radius: 50%;
+            width: 70px; height: 70px; border-radius: 50%;
             background: radial-gradient(circle, #21262d 0%, #0d1117 100%);
             border: 3px solid rgba(255,255,255,0.3); display: inline-flex;
-            align-items: center; justify-content: center; margin-bottom: 12px; overflow: hidden;
+            align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden;
         }
-        .detail-img-wrap img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
-        .note-box { background-color: rgba(255, 193, 7, 0.1); border-left: 4px solid #ffc107; color: #ffecb3; padding: 12px; font-size: 12px; border-radius: 6px; margin: 16px 0; text-align: left; }
-        .input-group { margin-top: 16px; text-align: left; }
-        .input-group label { font-size: 11px; color: var(--hint-color); display: block; margin-bottom: 6px; }
-        .input-group input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #30363d; background: #0d1117; color: #ffffff; box-sizing: border-box; font-size: 14px; outline: none; }
+        .detail-img-wrap img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; }
+        .note-box { background-color: rgba(255, 193, 7, 0.1); border-left: 3px solid #ffc107; color: #ffecb3; padding: 10px; font-size: 11px; border-radius: 6px; margin: 14px 0; text-align: left; line-height: 1.4; }
+        
+        .unavailable-msg {
+            background-color: rgba(255, 71, 87, 0.15);
+            border: 1px solid #ff4757;
+            color: #ff6b81;
+            padding: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 8px;
+            margin-top: 14px;
+        }
+
+        .input-group { margin-top: 14px; text-align: left; }
+        .input-group label { font-size: 10px; color: var(--hint-color); display: block; margin-bottom: 4px; }
+        .input-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: #ffffff; box-sizing: border-box; font-size: 13px; outline: none; }
 
         .trust-footer {
-            margin-top: 24px; background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
-            border: 1px solid #30363d; border-radius: 12px; padding: 10px 8px;
-            display: flex; justify-content: space-around; align-items: center; font-size: 9px; color: #8b9bb4; text-align: center;
+            margin-top: 20px; background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
+            border: 1px solid #30363d; border-radius: 10px; padding: 10px 4px;
+            display: flex; justify-content: space-around; align-items: center; font-size: 8px; color: #8b9bb4; text-align: center;
         }
         .trust-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
     </style>
@@ -169,7 +200,6 @@
     <div class="store-subtitle">✦ PREMIUM DIGITAL PRODUCTS ✦</div>
 </div>
 
-<!-- Tab Switcher (3 Tabs) -->
 <div id="tabContainer" class="tab-container">
     <button class="tab-btn active" id="tabPremium" onclick="switchTab('PREMIUM')">Premium</button>
     <button class="tab-btn" id="tabService" onclick="switchTab('SERVICE')">Log in Service</button>
@@ -187,23 +217,27 @@
         <div class="detail-img-wrap">
             <img id="detailLogo" src="" alt="Logo">
         </div>
-        <h3 id="productTitle" style="margin: 4px 0; font-size: 16px; color:#f0f6fc;"></h3>
-        <div id="productDuration" class="duration" style="font-size: 12px; margin-top: 4px;"></div>
-        <div id="productPrice" class="price" style="font-size: 18px; margin-top: 6px;"></div>
+        <h3 id="productTitle" style="margin: 4px 0; font-size: 15px; color:#f0f6fc;"></h3>
+        <div id="productDuration" class="duration" style="font-size: 11px; margin-top: 4px;"></div>
+        <div id="productPrice" class="price" style="font-size: 16px; margin-top: 6px;"></div>
     </div>
 
     <div id="noteBox" class="note-box" style="display:none;"></div>
     
-    <div class="input-group">
+    <div id="unavailMsg" class="unavailable-msg" style="display:none;">
+        ⚠️ လက်ရှိ ပစ္စည်းပြတ်လပ်နေပါသည် (Unavailable)
+    </div>
+
+    <div id="inputForm" class="input-group">
         <label for="accountData">Account ID / Email / Phone / Remarks:</label>
         <input type="text" id="accountData" placeholder="ဝယ်ယူမည့် အကောင့်အချက်အလက်ထည့်ပါ...">
     </div>
 </div>
 
 <div class="trust-footer">
-    <div class="trust-item"><span>🛡️</span> 100% SAFE & SECURE</div>
+    <div class="trust-item"><span>🛡️</span> SAFE & SECURE</div>
     <div class="trust-item"><span>⚡</span> INSTANT DELIVERY</div>
-    <div class="trust-item"><span>🎖️</span> PREMIUM QUALITY</div>
+    <div class="trust-item"><span>🎖️</span> PREMIUM</div>
     <div class="trust-item"><span>🎧</span> 24/7 SUPPORT</div>
 </div>
 
@@ -241,6 +275,9 @@
         document.getElementById('tabPremium').classList.toggle('active', tabType === 'PREMIUM');
         document.getElementById('tabService').classList.toggle('active', tabType === 'SERVICE');
         document.getElementById('tabGame').classList.toggle('active', tabType === 'GAME');
+        
+        document.getElementById('categoryGrid').style.display = 'none';
+        document.getElementById('detailView').style.display = 'none';
         showProducts();
     }
 
@@ -279,7 +316,7 @@
             showProducts();
         } catch (error) {
             console.error("Fetch error:", error);
-            document.getElementById('loading').innerHTML = "Data ရယူ၍ မရနိုင်ပါ။ (Apps Script Deploy ပြန်လုပ်ပေးရန် လိုအပ်နိုင်ပါသည်)";
+            document.getElementById('loading').innerHTML = "Data ရယူ၍ မရနိုင်ပါ။";
         }
     }
 
@@ -304,7 +341,7 @@
             if (!prodName) return;
 
             let isMatched = false;
-            if (currentTab === 'PREMIUM' && sheetType === "Products Master Database") isMatched = true;
+            if (currentTab === 'PREMIUM' && (sheetType === "Products Master Database" || sheetType === "Premium")) isMatched = true;
             if (currentTab === 'SERVICE' && sheetType === "Log in Service") isMatched = true;
             if (currentTab === 'GAME' && sheetType === "Game Items") isMatched = true;
 
@@ -316,7 +353,7 @@
         });
 
         if (uniqueProductsMap.size === 0) {
-            container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--hint-color); padding: 30px;">ယခု Tab တွင် ပစ္စည်းများ မရှိသေးပါ။</div>`;
+            container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--hint-color); padding: 30px; font-size: 12px;">ယခု Tab တွင် ပစ္စည်းများ မရှိသေးပါ။</div>`;
             return;
         }
 
@@ -360,11 +397,14 @@
                 const itemCat = getProp(item, ["category", "cat"]) || prodName;
                 const itemPrice = getProp(item, ["price", "cost"]) || '0';
                 const itemDuration = getProp(item, ["duration", "time"]) || '';
+                const itemStatus = (getProp(item, ["status", "stat"]) || 'Active').toLowerCase();
+                const isInactive = itemStatus === 'inactive';
+
                 const logoSrc = resolveLogo(item, itemCat);
                 const fallbackSrc = getSvgInitialsLogo(itemCat);
 
                 const card = document.createElement('div');
-                card.className = 'card';
+                card.className = `card ${isInactive ? 'is-inactive' : ''}`;
                 card.innerHTML = `
                     <div class="card-number">${(index + 1) < 10 ? '0' + (index + 1) : (index + 1)}</div>
                     <div class="card-img-wrap">
@@ -373,7 +413,7 @@
                     <h3>${itemCat}</h3>
                     ${itemDuration ? `<div class="duration">⏱ ${itemDuration}</div>` : ''}
                     <div class="price">${itemPrice} MMK</div>
-                    <div class="card-footer-ornament">👑</div>
+                    ${isInactive ? `<div class="unavailable-badge">UNAVAILABLE</div>` : `<div class="card-footer-ornament">👑</div>`}
                 `;
                 card.onclick = () => showDetail(item);
                 container.appendChild(card);
@@ -394,6 +434,10 @@
         const prodPrice = getProp(product, ["price", "cost"]);
         const prodDuration = getProp(product, ["duration", "time"]);
         const prodDesc = getProp(product, ["description", "desc"]);
+        
+        // Status Check
+        const prodStatus = (getProp(product, ["status", "stat"]) || 'Active').toLowerCase();
+        const isInactive = prodStatus === 'inactive';
 
         document.getElementById('detailLogo').src = resolveLogo(product, prodName);
         document.getElementById('productTitle').innerText = prodCat && prodCat !== prodName ? `${prodName} - ${prodCat}` : prodName;
@@ -408,12 +452,24 @@
             noteBox.style.display = 'none';
         }
 
-        try {
-            tg.MainButton.setText(`ORDER NOW (${prodPrice} MMK)`);
-            tg.MainButton.show();
-            tg.MainButton.offClick(sendOrder);
-            tg.MainButton.onClick(sendOrder);
-        } catch(e){}
+        // Inactive ဖြစ်ရင် Button ဖျောက်ပြီး Form ပိတ်ထားမည်
+        const unavailMsg = document.getElementById('unavailMsg');
+        const inputForm = document.getElementById('inputForm');
+
+        if (isInactive) {
+            unavailMsg.style.display = 'block';
+            inputForm.style.display = 'none';
+            try { tg.MainButton.hide(); } catch(e){}
+        } else {
+            unavailMsg.style.display = 'none';
+            inputForm.style.display = 'block';
+            try {
+                tg.MainButton.setText(`ORDER NOW (${prodPrice} MMK)`);
+                tg.MainButton.show();
+                tg.MainButton.offClick(sendOrder);
+                tg.MainButton.onClick(sendOrder);
+            } catch(e){}
+        }
     }
 
     function goBack() {
