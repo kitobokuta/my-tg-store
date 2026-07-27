@@ -1,648 +1,567 @@
 <!DOCTYPE html>
 <html lang="my">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jupiter Store</title>
-    <!-- Google Fonts for Serif Metallic Heading -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
-    <!-- Telegram WebApp SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --bg-color: #0b0f19;
-            --card-bg: #111827;
-            --card-border: #1f2937;
-            --accent-silver: #94a3b8;
-            --accent-glow: #e2e8f0;
-            --text-color: #ffffff;
-            --text-secondary: #64748b;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Jupiter Store</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: #07090e;
+            --text-color: #ffffff;
+            --hint-color: #8b9bb4;
+            --accent-red: #ff4757;
+            --button-color: #2481cc;
+        }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,0.2) 2px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,0.15) 1px, transparent 30px),
+                radial-gradient(rgba(255,255,255,0.1) 2px, transparent 40px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            color: var(--text-color);
+            margin: 0;
+            padding: 16px;
+            box-sizing: border-box;
+            min-height: 100vh;
+        }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 16px;
-            padding-bottom: 80px;
-        }
+        .store-header {
+            text-align: center;
+            margin-bottom: 24px;
+            position: relative;
+        }
+        .planet-icon {
+            width: 75px;
+            height: auto;
+            margin-bottom: -12px;
+            filter: drop-shadow(0 0 12px rgba(255,255,255,0.4));
+        }
+        h1.store-title {
+            font-family: "Cinzel", "Times New Roman", serif;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin: 0;
+            background: linear-gradient(180deg, #ffffff 20%, #b0bec5 60%, #546e7a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.8);
+        }
+        .store-subtitle {
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: #b0bec5;
+            text-transform: uppercase;
+            margin-top: 4px;
+            font-weight: 600;
+        }
 
-        /* Loading Screen */
-        #loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--bg-color);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.4s ease;
-        }
+        .back-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: #ffffff;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            display: none;
+            font-weight: 500;
+            backdrop-filter: blur(5px);
+        }
 
-        .jupiter-container {
-            position: relative;
-            width: 90px;
-            height: 90px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        /* Loading & Error Styles */
+        .loading-box {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 14px;
+            color: var(--hint-color);
+            font-size: 14px;
+        }
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid #58a6ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .jupiter-planet {
-            width: 50px;
-            height: 50px;
-            background: radial-gradient(circle at 30% 30%, #cbd5e1, #334155);
-            border-radius: 50%;
-            box-shadow: 0 0 20px rgba(148, 163, 184, 0.3);
-            z-index: 2;
-        }
+        .retry-btn {
+            background: #238636;
+            color: #white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-        .jupiter-ring {
-            position: absolute;
-            width: 90px;
-            height: 34px;
-            border: 2px solid rgba(226, 232, 240, 0.8);
-            border-radius: 50%;
-            transform: rotate(-25deg);
-            animation: spinRing 1.8s linear infinite;
-            z-index: 3;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-        }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 30px; }
 
-        @keyframes spinRing {
-            0% { transform: rotate(-25deg) scale(1); opacity: 0.8; }
-            50% { transform: rotate(-25deg) scale(1.06); opacity: 1; }
-            100% { transform: rotate(-25deg) scale(1); opacity: 0.8; }
-        }
+        .card {
+            position: relative;
+            background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
+            border-radius: 14px;
+            padding: 18px 10px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25);
+            border: 1px solid #30363d;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .card:active { transform: scale(0.97); border-color: #58a6ff; }
 
-        .loader-text {
-            margin-top: 20px;
-            font-size: 12px;
-            letter-spacing: 2px;
-            color: var(--accent-silver);
-            font-weight: 600;
-        }
+        .card-number {
+            position: absolute;
+            top: 8px;
+            left: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #8b9bb4;
+            letter-spacing: 0.5px;
+        }
 
-        .view-section {
-            display: none;
-        }
-        .view-section.active {
-            display: block;
-        }
+        .card-img-wrap {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #21262d 0%, #0d1117 100%);
+            border: 2px solid rgba(255,255,255,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 4px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+        .card img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
 
-        /* Store Header */
-        .store-header {
-            text-align: center;
-            margin-bottom: 24px;
-            padding-top: 10px;
-        }
+        .card h3 {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 700;
+            color: #f0f6fc;
+            word-break: break-word;
+            line-height: 1.3;
+        }
 
-        .store-logo-container {
-            position: relative;
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        .duration { 
+            font-size: 10px; 
+            font-weight: 700; 
+            color: var(--accent-red); 
+            margin-top: 4px; 
+            letter-spacing: 0.3px;
+        }
+        .price { 
+            font-weight: 800; 
+            color: #58a6ff; 
+            margin-top: 4px; 
+            font-size: 12px; 
+        }
 
-        .store-logo-planet {
-            width: 38px;
-            height: 38px;
-            background: radial-gradient(circle at 30% 30%, #cbd5e1, #334155);
-            border-radius: 50%;
-            box-shadow: 0 0 15px rgba(148, 163, 184, 0.4);
-            z-index: 2;
-        }
+        .card-footer-ornament {
+            margin-top: 8px;
+            font-size: 10px;
+            color: #8b9bb4;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-footer-ornament::before, .card-footer-ornament::after {
+            content: "—";
+            color: #30363d;
+        }
 
-        .store-logo-ring {
-            position: absolute;
-            width: 70px;
-            height: 26px;
-            border: 1.5px solid rgba(226, 232, 240, 0.9);
-            border-radius: 50%;
-            transform: rotate(-25deg);
-            z-index: 3;
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
-        }
+        .detail-view { 
+            display: none; 
+            background: linear-gradient(145deg, #161b22 0%, #0d1117 100%); 
+            padding: 24px 16px; 
+            border-radius: 16px; 
+            border: 1px solid #30363d;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            text-align: center;
+        }
+        .detail-img-wrap {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #21262d 0%, #0d1117 100%);
+            border: 3px solid rgba(255,255,255,0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.6);
+            overflow: hidden;
+        }
+        .detail-img-wrap img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
 
-        .store-header h1 {
-            font-family: 'Cinzel', serif;
-            font-size: 24px;
-            letter-spacing: 3px;
-            font-weight: 700;
-            margin-bottom: 6px;
-            background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 10px rgba(148, 163, 184, 0.2);
-        }
+        .note-box {
+            background-color: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            color: #ffecb3;
+            padding: 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            margin: 16px 0;
+            text-align: left;
+            line-height: 1.4;
+        }
 
-        .store-header p {
-            font-size: 11px;
-            color: var(--accent-silver);
-            letter-spacing: 2px;
-            font-weight: 600;
-        }
+        .input-group { margin-top: 16px; text-align: left; }
+        .input-group label { font-size: 11px; color: var(--hint-color); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #30363d;
+            background: #0d1117;
+            color: #ffffff;
+            box-sizing: border-box;
+            font-size: 14px;
+            outline: none;
+        }
+        .input-group input:focus { border-color: #58a6ff; }
 
-        /* Product Grid */
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #2481cc 0%, #1a5f96 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(36, 129, 204, 0.4);
+        }
+        .submit-btn:active { transform: scale(0.98); }
 
-        .product-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 18px 14px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .product-card:active {
-            transform: scale(0.97);
-            border-color: var(--accent-silver);
-        }
-
-        .product-icon {
-            width: 44px;
-            height: 44px;
-            background: rgba(148, 163, 184, 0.08);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 auto 10px;
-            color: var(--accent-glow);
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .product-name {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        /* Second UI Styles */
-        .back-btn {
-            background: none;
-            border: none;
-            color: var(--accent-silver);
-            font-size: 13px;
-            cursor: pointer;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .sub-product-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .sub-product-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 14px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.2s ease;
-        }
-
-        .sub-product-card:active {
-            transform: scale(0.98);
-            border-color: var(--accent-silver);
-        }
-
-        .sub-info .sub-type {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
-
-        .sub-info .sub-duration {
-            font-size: 11px;
-            color: #f87171; /* အနီရောင် (Red) */
-            background: rgba(248, 113, 113, 0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
-            display: inline-block;
-            margin-bottom: 4px;
-            font-weight: 600;
-        }
-
-        .sub-info .sub-price {
-            font-size: 12px;
-            color: #4ade80; /* အစိမ်းရောင် (Green) */
-            font-weight: 700;
-        }
-
-        .select-arrow {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        /* Third UI Styles */
-        .details-container {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 13px;
-        }
-
-        .info-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .info-label {
-            color: var(--text-secondary);
-        }
-
-        .info-value {
-            font-weight: 600;
-            text-align: right;
-        }
-
-        /* Summary specific colors */
-        #summary-duration {
-            color: #f87171; /* အနီရောင် */
-        }
-
-        #summary-price {
-            color: #4ade80; /* အစိမ်းရောင် */
-            font-weight: 700;
-        }
-
-        #summary-note {
-            color: var(--text-color);
-            font-weight: 500;
-        }
-
-        .input-group {
-            position: relative;
-            margin-bottom: 16px;
-        }
-
-        .note-input {
-            width: 100%;
-            background-color: #080c14;
-            border: 1px solid var(--card-border);
-            border-radius: 10px;
-            padding: 14px 12px;
-            color: var(--text-color);
-            font-size: 13px;
-            outline: none;
-            resize: none;
-            height: 90px;
-            transition: border-color 0.2s;
-        }
-
-        .note-input:focus {
-            border-color: var(--accent-silver);
-        }
-
-        .floating-placeholder {
-            position: absolute;
-            top: 14px;
-            left: 13px;
-            color: var(--text-secondary);
-            font-size: 12px;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
-            line-height: 1.4;
-        }
-
-        .action-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #334155, #1e293b);
-            border: 1px solid #475569;
-            color: white;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            text-align: center;
-            transition: opacity 0.2s;
-        }
-
-        .action-btn:active {
-            opacity: 0.8;
-        }
-    </style>
+        .trust-footer {
+            margin-top: 24px;
+            background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 10px 8px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-size: 9px;
+            color: #8b9bb4;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+        }
+        .trust-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .trust-item span { font-size: 13px; }
+    </style>
 </head>
 <body>
 
-    <!-- Loading Screen -->
-    <div id="loader">
-        <div class="jupiter-container">
-            <div class="jupiter-planet"></div>
-            <div class="jupiter-ring"></div>
-        </div>
-        <div class="loader-text">JUPITER STORE...</div>
-    </div>
+<div class="store-header">
+    <svg class="planet-icon" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="100" cy="65" rx="90" ry="25" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="4" transform="rotate(-15 100 65)"/>
+        <circle cx="100" cy="65" r="45" fill="url(#planetGrad)" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
+        <ellipse cx="100" cy="65" rx="90" ry="25" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="4" stroke-dasharray="100 300" transform="rotate(-15 100 65)"/>
+        <defs>
+            <radialGradient id="planetGrad" cx="30%" cy="30%" r="70%">
+                <stop offset="0%" stop-color="#cfd8dc"/>
+                <stop offset="50%" stop-color="#78909c"/>
+                <stop offset="100%" stop-color="#263238"/>
+            </radialGradient>
+        </defs>
+    </svg>
+    <h1 class="store-title">JUPITER STORE</h1>
+    <div class="store-subtitle">✦ PREMIUM DIGITAL PRODUCTS ✦</div>
+</div>
 
-    <!-- UI 1: Product Grid -->
-    <div id="view-1" class="view-section active">
-        <div class="store-header">
-            <div class="store-logo-container">
-                <div class="store-logo-planet"></div>
-                <div class="store-logo-ring"></div>
-            </div>
-            <h1>JUPITER STORE</h1>
-            <p>✦ PREMIUM DIGITAL PRODUCTS ✦</p>
-        </div>
-        <div class="product-grid" id="mainProductGrid"></div>
-    </div>
+<button id="backBtn" class="back-btn" onclick="goBack()">← Back</button>
 
-    <!-- UI 2: Plan / Type & Duration Selection -->
-    <div id="view-2" class="view-section">
-        <button class="back-btn" onclick="goBackToView1()">❮ Back to Store</button>
-        <div class="store-header" style="margin-bottom: 16px;">
-            <div class="store-logo-container">
-                <div class="store-logo-planet"></div>
-                <div class="store-logo-ring"></div>
-            </div>
-            <h1 id="selected-product-title">PRODUCT</h1>
-            <p>✦ SELECT PLAN / TYPE ✦</p>
-        </div>
-        <div class="sub-product-list" id="subProductList"></div>
-    </div>
+<!-- Dynamic Status Box -->
+<div id="loadingBox" class="loading-box">
+    <div class="spinner"></div>
+    <div>Google Sheet မှ Data များကို ရယူနေပါသည်...</div>
+</div>
 
-    <!-- UI 3: Order Confirmation -->
-    <div id="view-3" class="view-section">
-        <button class="back-btn" onclick="goBackToView2()">❮ Back to Plans</button>
-        <div class="store-header" style="margin-bottom: 16px;">
-            <div class="store-logo-container">
-                <div class="store-logo-planet"></div>
-                <div class="store-logo-ring"></div>
-            </div>
-            <h1>ORDER DETAILS</h1>
-            <p>✦ CONFIRMATION ✦</p>
-        </div>
+<div id="productGrid" class="grid" style="display: none;"></div>
+<div id="categoryGrid" class="grid" style="display: none;"></div>
 
-        <div class="details-container">
-            <div class="info-row">
-                <span class="info-label">Product Name:</span>
-                <span class="info-value" id="summary-name">-</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Plan / Type:</span>
-                <span class="info-value" id="summary-type">-</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Duration:</span>
-                <span class="info-value" id="summary-duration">-</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Price:</span>
-                <span class="info-value" id="summary-price">-</span>
-            </div>
-            <!-- Note / Condition Column -->
-            <div class="info-row">
-                <span class="info-label">Note / Condition:</span>
-                <span class="info-value" id="summary-note">-</span>
-            </div>
-        </div>
+<div id="detailView" class="detail-view">
+    <div>
+        <div class="detail-img-wrap">
+            <img id="detailLogo" src="" alt="Logo">
+        </div>
+        <h3 id="productTitle" style="margin: 4px 0; font-size: 16px; color:#f0f6fc;"></h3>
+        <div id="productDuration" class="duration" style="font-size: 12px; margin-top: 4px;"></div>
+        <div id="productPrice" class="price" style="font-size: 18px; margin-top: 6px;"></div>
+    </div>
 
-        <div class="details-container">
-            <div style="font-size: 12px; color: var(--accent-silver); margin-bottom: 8px;">Customer Information / Account Details</div>
-            <div class="input-group">
-                <textarea id="customerNote" class="note-input" oninput="handleInputTyping()"></textarea>
-                <div id="customPlaceholder" class="floating-placeholder">
-                    ph no, gmail, other...<br>
-                    ကျေးဇူးပြု၍ လိုအပ်သည်များကို ဤနေရာတွင် ဖြည့်သွင်းပါ
-                </div>
-            </div>
-            <button class="action-btn" onclick="submitOrder()">Confirm & Order Now</button>
-        </div>
-    </div>
+    <div id="noteBox" class="note-box" style="display:none;"></div>
+    
+    <div class="input-group">
+        <label for="accountData">Account ID / Email / Phone / Remarks:</label>
+        <input type="text" id="accountData" placeholder="ဝယ်ယူမည့် အကောင့်အချက်အလက်ထည့်ပါ...">
+    </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
+    <button id="webSubmitBtn" class="submit-btn" style="display: none;" onclick="sendOrder()">ORDER NOW</button>
+</div>
 
-        // Database items containing the specific note/condition text
-        const productsDatabase = [
-            { id: "PROD-MN-001", name: "CapCut Pro", type: "Private Account", duration: "1 Month", priceText: "14,500 MMK", costPrice: 10500, note: "3 devices" },
-            { id: "PROD-MN-002", name: "CapCut Pro", type: "Private (5 accounts)", duration: "1 Month", priceText: "57,500 MMK", costPrice: 47500, note: "3 devices" },
-            { id: "PROD-MN-003", name: "CapCut Pro", type: "Private (10 accounts)", duration: "1 Month", priceText: "100,000 MMK", costPrice: 90000, note: "3 devices" },
-            { id: "PROD-MN-004", name: "CapCut Pro", type: "Private Account", duration: "6 Months", priceText: "81,000 MMK", costPrice: 73000, note: "3 devices" },
-            { id: "PROD-MN-005", name: "CapCut Pro", type: "Shared Account", duration: "1 Month", priceText: "8,000 MMK", costPrice: 4000, note: "1 device only/device မချိန်းရ" },
-            { id: "PROD-MN-006", name: "Spotify Premium", type: "Family Plan", duration: "1 Month", priceText: "9,500 MMK", costPrice: 5500, note: "ကိုယ်ပိုင် Mail ဖြင့် Invite လုပ်ပေးသည်။" },
-            { id: "PROD-MN-007", name: "Spotify Premium", type: "Family Plan", duration: "6 Months", priceText: "36,000 MMK", costPrice: 25000, note: "Location နိုင်ငံတူညီရပါမည်။" },
-            { id: "PROD-MN-008", name: "Spotify Premium", type: "Family Plan", duration: "12 Months", priceText: "57,000 MMK", costPrice: 45000, note: "တစ်နှစ်စာ အထူးဈေးနှုန်း။" },
-            { id: "PROD-MN-009", name: "Spotify Premium", type: "Individual Plan", duration: "3 Months", priceText: "31,500 MMK", costPrice: 22500, note: "Individual သီးသန့်အကောင့်။" },
-            { id: "PROD-MN-010", name: "Spotify Premium", type: "Individual Plan", duration: "6 Months", priceText: "63,000 MMK", costPrice: 53000, note: "Individual သီးသန့်အကောင့်။" },
-            { id: "PROD-MN-011", name: "Spotify Premium", type: "Individual Plan", duration: "12 Months", priceText: "94,000 MMK", costPrice: 84000, note: "Individual သီးသန့်အကောင့်။" },
-            { id: "PROD-MN-012", name: "Canva Pro", type: "Business Pro", duration: "1 Month", priceText: "11,000 MMK", costPrice: 8000, note: "Business Team Pro အဖြစ် သုံးရမည်။" },
-            { id: "PROD-MN-013", name: "Canva Pro", type: "Edu Pro", duration: "1 Year", priceText: "4,000 MMK", costPrice: 2500, note: "Education Link ဖြင့် Join ရမည်။" },
-            { id: "PROD-MN-014", name: "Channel Boost", type: "Level Boost", duration: "3 Months", priceText: "2,100 MMK", costPrice: 1700, note: "Telegram Channel Boost သက်တမ်း။" },
-            { id: "PROD-MN-015", name: "Channel Boost", type: "Level Boost", duration: "6 Months", priceText: "2,600 MMK", costPrice: 2200, note: "Telegram Channel Boost သက်တမ်း။" },
-            { id: "PROD-MN-016", name: "Channel Boost", type: "Level Boost", duration: "1 Year", priceText: "3,000 MMK", costPrice: 2600, note: "Telegram Channel Boost သက်တမ်း။" },
-            { id: "PROD-MN-017", name: "Jump Jump VPN", type: "Shared (1 Device)", duration: "1 Month", priceText: "12,000 MMK", costPrice: 10000, note: "1 Device သုံးရန်။" },
-            { id: "PROD-MN-018", name: "Jump Jump VPN", type: "Shared (2 Devices)", duration: "1 Month", priceText: "23,000 MMK", costPrice: 19000, note: "2 Devices သုံးရန်။" },
-            { id: "PROD-MN-019", name: "Hiddify / V2BOX", type: "Standard", duration: "1 Month", priceText: "5,500 MMK", costPrice: 4500, note: "Config ဖိုင် တိုက်ရိုက်ထုတ်ပေးသည်။" },
-            { id: "PROD-MN-020", name: "Hiddify / V2BOX", type: "Standard", duration: "3 Months", priceText: "16,000 MMK", costPrice: 13000, note: "3 လစာ Config ဖိုင်။" },
-            { id: "PROD-MN-021", name: "Express VPN", type: "1 Device", duration: "1 Month", priceText: "4,000 MMK", costPrice: 2500, note: "1 Device သုံးရန်။" },
-            { id: "PROD-MN-022", name: "Express VPN", type: "Whole Account (8 Devices)", duration: "1 Month", priceText: "19,500 MMK", costPrice: 18000, note: "အကောင့်အပြည့်အစုံ ရမည်။" },
-            { id: "PROD-MN-023", name: "Proton VPN", type: "Shared Account", duration: "1 Month", priceText: "4,000 MMK", costPrice: 2500, note: "Shared အကောင့်။" },
-            { id: "PROD-MN-024", name: "Proton VPN", type: "Full Account", duration: "1 Month", priceText: "16,500 MMK", costPrice: 15000, note: "Full Account သီးသန့်။" },
-            { id: "PROD-MN-025", name: "Super Duolingo", type: "Standard", duration: "1 Month", priceText: "7,500 MMK", costPrice: 4000, note: "Duolingo Super Plan။" },
-            { id: "PROD-MN-026", name: "Super Duolingo", type: "Standard", duration: "1 Year", priceText: "70,000 MMK", costPrice: 50000, note: "Duolingo 1 Year Plan။" },
-            { id: "PROD-MN-027", name: "Quillbot Premium", type: "Shared Account", duration: "3 Months", priceText: "18,000 MMK", costPrice: 12000, note: "Paraphrasing tool premium။" },
-            { id: "PROD-MN-028", name: "ChatGPT Plus", type: "Official Private", duration: "1 Month", priceText: "100,000 MMK", costPrice: 90000, note: "တရားဝင် Private အကောင့်။" },
-            { id: "PROD-MN-029", name: "ChatGPT Plus", type: "Shared Account", duration: "1 Month", priceText: "23,000 MMK", costPrice: 19000, note: "Shared Plus အကောင့်။" },
-            { id: "PROD-MN-030", name: "ChatGPT Go", type: "Private Account", duration: "1 Month", priceText: "29,000 MMK", costPrice: 26000, note: "Private Account။" },
-            { id: "PROD-MN-031", name: "Meitu VIP", type: "VIP", duration: "1 Month", priceText: "18,000 MMK", costPrice: 15000, note: "Meitu VIP 1 လ။" },
-            { id: "PROD-MN-032", name: "Meitu VIP", type: "SVIP", duration: "7 Days", priceText: "5,600 MMK", costPrice: 4500, note: "Meitu SVIP 7 ရက်။" },
-            { id: "PROD-MN-033", name: "Meitu VIP", type: "SVIP", duration: "1 Month", priceText: "30,500 MMK", costPrice: 27500, note: "Meitu SVIP 1 လ။" },
-            { id: "PROD-MN-034", name: "Wink VIP", type: "Standard", duration: "1 Month", priceText: "8,500 MMK", costPrice: 5500, note: "Wink VIP 1 လ။" },
-            { id: "PROD-MN-035", name: "Wink VIP", type: "Standard", duration: "1 Year", priceText: "50,000 MMK", costPrice: 38000, note: "Wink VIP 1 နှစ်။" },
-            { id: "PROD-MN-036", name: "Grammarly Pro", type: "Official Private", duration: "1 Month", priceText: "30,000 MMK", costPrice: 25000, note: "Grammarly Official Private။" },
-            { id: "PROD-MN-037", name: "Grammarly Pro", type: "Shared Account", duration: "3 Months", priceText: "41,000 MMK", costPrice: 35000, note: "Shared 3 လစာ။" },
-            { id: "PROD-MN-038", name: "Zoom Pro", type: "Standard", duration: "14 Days", priceText: "7,500 MMK", costPrice: 5000, note: "Zoom Pro 14 ရက်။" },
-            { id: "PROD-MN-039", name: "Zoom Pro", type: "Standard", duration: "28 Days", priceText: "13,000 MMK", costPrice: 9000, note: "Zoom Pro 28 ရက်။" },
-            { id: "PROD-MN-040", name: "Zoom Pro", type: "Own Mail", duration: "1 Month", priceText: "18,000 MMK", costPrice: 15000, note: "ကိုယ့်အီးမေးလ်ဖြင့် ပြုလုပ်ပေးသည်။" },
-            { id: "PROD-MN-041", name: "Telegram Account", type: "Fresh Account", duration: "Permanent", priceText: "2,500 MMK", costPrice: 1500, note: "Session + JSON format ဖြင့် ပို့ပေးသည်။" },
-            { id: "PROD-MN-042", name: "PicsArt Pro", type: "Shared Account", duration: "6 Months", priceText: "33,000 MMK", costPrice: 28000, note: "PicsArt Shared 6 လ။" },
-            { id: "PROD-MN-043", name: "Alight Motion", type: "Official Private", duration: "1 Year", priceText: "9,000 MMK", costPrice: 3000, note: "Official Private 1 နှစ်။" },
-            { id: "PROD-MN-044", name: "TON Coin", type: "Crypto Transfer", duration: "Instant (Per 1 TON)", priceText: "8,000 MMK", costPrice: 7800, note: "Wallet လိပ်စာသို့ ချက်ချင်းရောက်သည်။" },
-            { id: "PROD-MN-045", name: "Telegram SMS Fee", type: "Instant Fee", duration: "Instant", priceText: "11,500 MMK", costPrice: 8500, note: "SMS Verification Fee။" },
-            { id: "PROD-MN-046", name: "Telegram Star", type: "Package 50", duration: "Instant", priceText: "3,800 MMK", costPrice: 3700, note: "Stars 50 ခု။" },
-            { id: "PROD-MN-047", name: "Telegram Star", type: "Package 100", duration: "Instant", priceText: "7,600 MMK", costPrice: 7400, note: "Stars 100 ခု။" },
-            { id: "PROD-MN-048", name: "Telegram Star", type: "Package 500", duration: "Instant", priceText: "38,000 MMK", costPrice: 37000, note: "Stars 500 ခု။" },
-            { id: "PROD-MN-049", name: "Telegram Star", type: "Package 1000", duration: "Instant", priceText: "76,000 MMK", costPrice: 74000, note: "Stars 1000 ခု။" },
-            { id: "PROD-MN-050", name: "Telegram Star", type: "Package 5000", duration: "Instant", priceText: "380,000 MMK", costPrice: 370000, note: "Stars 5000 ခု။" },
-            { id: "PROD-MN-051", name: "Telegram Premium", type: "Official", duration: "3 Months", priceText: "49,000 MMK", costPrice: 47500, note: "Gift Link ဖြင့် ပို့ပေးသည်။" },
-            { id: "PROD-MN-052", name: "Telegram Premium", type: "Official", duration: "6 Months", priceText: "67,000 MMK", costPrice: 66000, note: "Gift Link ဖြင့် ပို့ပေးသည်။" },
-            { id: "PROD-MN-053", name: "Telegram Premium", type: "Official", duration: "12 Months", priceText: "120,000 MMK", costPrice: 118000, note: "Gift Link ဖြင့် ပို့ပေးသည်။" },
-            { id: "PROD-MN-054", name: "Netflix Premium", type: "Shared Account", duration: "1 Month", priceText: "12,000 MMK", costPrice: 9000, note: "Profile တစ်ခုစာ သုံးရန်။" },
-            { id: "PROD-MN-055", name: "Netflix Premium", type: "Private (No TV)", duration: "1 Month", priceText: "20,000 MMK", costPrice: 15000, note: "ဖုန်းနှင့် တက်ဘလက်အတွက်သာ။" },
-            { id: "PROD-MN-056", name: "Netflix Premium", type: "Private (With TV)", duration: "1 Month", priceText: "21,500 MMK", costPrice: 16500, note: "TV ပါ သုံးနိုင်သော Private အကောင့်။" },
-            { id: "PROD-MN-057", name: "Steam Wallet", type: "Gift Card", duration: "5 Dollars", priceText: "27,500 MMK", costPrice: 25000, note: "Steam Code ဖြင့် ပို့ပေးသည်။" },
-            { id: "PROD-MN-058", name: "Steam Wallet", type: "Gift Card", duration: "25 Dollars", priceText: "132,500 MMK", costPrice: 122000, note: "Steam Code ဖြင့် ပို့ပေးသည်။" },
-            { id: "PROD-MN-059", name: "Steam Wallet", type: "Gift Card", duration: "50 Dollars", priceText: "269,000 MMK", costPrice: 244000, note: "Steam Code ဖြင့် ပို့ပေးသည်။" },
-            { id: "PROD-MN-064", name: "YouTube Premium", type: "Standard", duration: "1 Month", priceText: "12,500 MMK", costPrice: 8000, note: "Family Invite ဖြင့် လုပ်ပေးသည်။" },
-            { id: "PROD-MN-065", name: "Disney Plus", type: "Standard", duration: "1 Month", priceText: "20,000 MMK", costPrice: 14000, note: "Disney+ Standard Plan။" },
-            { id: "PROD-MN-066", name: "Microsoft 365", type: "Standard", duration: "1 Month", priceText: "9,500 MMK", costPrice: 6500, note: "Office 365 Account။" },
-            { id: "PROD-MN-068", name: "Microsoft 365", type: "Standard", duration: "Lifetime", priceText: "60,000 MMK", costPrice: 42000, note: "Lifetime Account။" },
-            { id: "PROD-MN-070", name: "Gemini Pro", type: "Standard", duration: "1 Month", priceText: "7,000 MMK", costPrice: 4000, note: "Gemini Advanced / Pro Plan။" },
-            { id: "PROD-MN-073", name: "Viber Plus", type: "Standard", duration: "1 Month", priceText: "13,500 MMK", costPrice: 10500, note: "Viber Plus 1 လ။" },
-            { id: "PROD-MN-074", name: "Viber Plus", type: "Standard", duration: "3 Months", priceText: "25,000 MMK", costPrice: 20500, note: "Viber Plus 3 လ။" },
-            { id: "PROD-MN-075", name: "Viber Plus", type: "Standard", duration: "6 Months", priceText: "40,500 MMK", costPrice: 34500, note: "Viber Plus 6 လ။" },
-            { id: "PROD-MN-076", name: "Viber Plus", type: "Standard", duration: "12 Months", priceText: "62,500 MMK", costPrice: 56500, note: "Viber Plus 1 နှစ်။" }
-        ];
+<div class="trust-footer">
+    <div class="trust-item"><span>🛡️</span> 100% SAFE & SECURE</div>
+    <div class="trust-item"><span>⚡</span> INSTANT DELIVERY</div>
+    <div class="trust-item"><span>🎖️</span> PREMIUM QUALITY</div>
+    <div class="trust-item"><span>🎧</span> 24/7 SUPPORT</div>
+</div>
 
-        let selectedProductData = {
-            name: '',
-            type: '',
-            duration: '',
-            priceText: '',
-            costPrice: 0,
-            note: ''
-        };
+<script>
+    // GOOGLE APPS SCRIPT WEB APP URL
+    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwl1TYgf-TeZzlka2lq78tXkdXsq9o0S6W-mte9k38Jn431EQvkiMYnDGRerkgismLx/exec";
 
-        function renderMainProducts() {
-            const grid = document.getElementById('mainProductGrid');
-            grid.innerHTML = '';
-            const uniqueNames = [...new Set(productsDatabase.map(p => p.name))];
+    let productsDatabase = [];
+    let currentView = 'PRODUCTS';
+    let lastSelectedProductName = '';
+    let selectedProductData = null;
 
-            uniqueNames.forEach(name => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.onclick = () => openSubProducts(name);
-                const iconChar = name.charAt(0).toUpperCase();
+    // Telegram WebApp Handling
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    if (tg) {
+        try { tg.expand(); tg.ready(); } catch(e){}
+    }
 
-                card.innerHTML = `
-                    <div class="product-icon">${iconChar}</div>
-                    <div class="product-name">${name}</div>
-                `;
-                grid.appendChild(card);
-            });
-        }
+    // Dynamic Initial Logo Generator
+    function getSvgInitialsLogo(text) {
+        const initial = (text || "J").trim().charAt(0).toUpperCase();
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="50" fill="url(#metalGrad)"/>
+            <defs>
+                <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#374151"/>
+                    <stop offset="100%" stop-color="#111827"/>
+                </linearGradient>
+            </defs>
+            <text x="50%" y="54%" font-family="-apple-system, Roboto, sans-serif" font-weight="bold" font-size="44" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text>
+        </svg>`;
+        return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+    }
 
-        window.addEventListener("load", () => {
-            renderMainProducts();
-            setTimeout(() => {
-                const loader = document.getElementById("loader");
-                loader.style.opacity = "0";
-                setTimeout(() => { loader.style.display = "none"; }, 400);
-            }, 600);
-        });
+    // Helper: Safely Map Fields from Google Sheet Response
+    function normalizeItem(raw) {
+        return {
+            id: raw.id || raw.ID || raw.code || raw.Code || "PROD-" + Math.floor(Math.random()*10000),
+            name: raw.name || raw.Name || raw.product_name || raw.Item || raw.item || "Unknown Product",
+            type: raw.type || raw.Type || raw.category || raw.Category || "Standard",
+            duration: raw.duration || raw.Duration || raw.Plan || "N/A",
+            priceText: raw.priceText || raw.price || raw.Price || raw.price_text || (raw.sellingPrice ? raw.sellingPrice + " MMK" : "0 MMK"),
+            costPrice: raw.costPrice || raw.cost_price || raw.CostPrice || raw.cost || 0,
+            note: raw.note || raw.Note || raw.condition || raw.Remark || raw.remark || "-"
+        };
+    }
 
-        function openSubProducts(productName) {
-            document.getElementById('selected-product-title').innerText = productName.toUpperCase();
-            const subList = document.getElementById('subProductList');
-            subList.innerHTML = '';
+    // Fetch Products from Google Sheet API
+    async function loadProductsFromSheet() {
+        const loadingBox = document.getElementById('loadingBox');
+        loadingBox.style.display = 'block';
+        loadingBox.innerHTML = `
+            <div class="spinner"></div>
+            <div>Google Sheet မှ Data များကို ရယူနေပါသည်...</div>
+        `;
 
-            const filteredItems = productsDatabase.filter(p => p.name === productName);
+        try {
+            const response = await fetch(SHEET_API_URL);
+            if (!response.ok) throw new Error("HTTP Error: " + response.status);
 
-            filteredItems.forEach(item => {
-                const subCard = document.createElement('div');
-                subCard.className = 'sub-product-card';
-                subCard.onclick = () => openOrderDetails(item.name, item.type, item.duration, item.priceText, item.costPrice, item.note);
+            const data = await response.json();
+            
+            // Handle array directly or wrapped in data property
+            const rawList = Array.isArray(data) ? data : (data.products || data.data || []);
+            
+            if (rawList.length === 0) {
+                loadingBox.innerHTML = `<div>မည့်သည့် Product မှ မတွေ့ရှိပါ သို့မဟုတ် Google Sheet Data လွတ်နေပါသည်။</div>`;
+                return;
+            }
 
-                subCard.innerHTML = `
-                    <div class="sub-info">
-                        <div class="sub-type">${item.type}</div>
-                        <div class="sub-duration">⏱ ${item.duration}</div>
-                        <div class="sub-price">${item.priceText}</div>
-                    </div>
-                    <div class="select-arrow">❯</div>
-                `;
-                subList.appendChild(subCard);
-            });
+            productsDatabase = rawList.map(item => normalizeItem(item));
+            loadingBox.style.display = 'none';
+            renderMainProducts();
 
-            document.getElementById('view-1').classList.remove('active');
-            document.getElementById('view-2').classList.add('active');
-        }
+        } catch (error) {
+            console.error("Fetch Error:", error);
+            loadingBox.innerHTML = `
+                <div style="color: #ff4757; font-weight: bold; margin-bottom: 8px;">Data ရယူ၍ မရရှိပါ!</div>
+                <div style="font-size: 12px;">အင်တာနက် သို့မဟုတ် Google Sheet Link ကို စစ်ဆေးပေးပါ။</div>
+                <button class="retry-btn" onclick="loadProductsFromSheet()">ပြန်လည်ကြိုးစားရန်</button>
+            `;
+        }
+    }
 
-        function openOrderDetails(name, type, duration, priceText, costPrice, note) {
-            selectedProductData.name = name;
-            selectedProductData.type = type;
-            selectedProductData.duration = duration;
-            selectedProductData.priceText = priceText;
-            selectedProductData.costPrice = costPrice;
-            selectedProductData.note = note || "-";
+    function renderMainProducts() {
+        currentView = 'PRODUCTS';
+        document.getElementById('backBtn').style.display = 'none';
+        document.getElementById('productGrid').style.display = 'grid';
+        document.getElementById('categoryGrid').style.display = 'none';
+        document.getElementById('detailView').style.display = 'none';
 
-            document.getElementById('summary-name').innerText = name;
-            document.getElementById('summary-type').innerText = type;
-            document.getElementById('summary-duration').innerText = duration;
-            document.getElementById('summary-price').innerText = priceText;
-            document.getElementById('summary-note').innerText = selectedProductData.note;
+        if (tg && tg.MainButton) tg.MainButton.hide();
 
-            document.getElementById('view-2').classList.remove('active');
-            document.getElementById('view-3').classList.add('active');
-        }
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = '';
 
-        function goBackToView1() {
-            document.getElementById('view-2').classList.remove('active');
-            document.getElementById('view-1').classList.add('active');
-        }
+        const uniqueNames = [...new Set(productsDatabase.map(p => p.name))];
 
-        function goBackToView2() {
-            document.getElementById('view-3').classList.remove('active');
-            document.getElementById('view-2').classList.add('active');
-        }
+        uniqueNames.forEach((name, index) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = () => showVariants(name);
 
-        function handleInputTyping() {
-            const textarea = document.getElementById('customerNote');
-            const placeholder = document.getElementById('customPlaceholder');
-            if (textarea.value.trim().length > 0) {
-                placeholder.style.opacity = '0';
-            } else {
-                placeholder.style.opacity = '1';
-            }
-        }
+            const cardNum = (index + 1) < 10 ? '0' + (index + 1) : (index + 1);
+            const logoSrc = getSvgInitialsLogo(name);
 
-        function submitOrder() {
-            const customerNote = document.getElementById('customerNote').value.trim() || "-";
-            const orderData = {
-                order_id: "ORD-" + Math.floor(100000000 + Math.random() * 900000000),
-                full_item_name: `${selectedProductData.name} - ${selectedProductData.type} (${selectedProductData.duration})`,
-                price: selectedProductData.priceText.replace(/[^0-9]/g, ''),
-                cost_price: selectedProductData.costPrice,
-                product_note: selectedProductData.note,
-                customer_note: customerNote
-            };
+            card.innerHTML = `
+                <div class="card-number">${cardNum}</div>
+                <div class="card-img-wrap">
+                    <img src="${logoSrc}" alt="${name}">
+                </div>
+                <h3>${name}</h3>
+                <div class="card-footer-ornament">👑</div>
+            `;
+            grid.appendChild(card);
+        });
+    }
 
-        // တောင်းဆိုချက်အရ orderData တွင် product_note အနေဖြင့် database ထဲက note ကို ပေးပို့မည်ဖြစ်ပြီး
-        // ၎င်းကို Telegram Bot ဘက်သို့ ပို့ဆောင်မည်ဖြစ်သည်။
-            tg.sendData(JSON.stringify(orderData));
-            tg.close();
-        }
-    </script>
+    function showVariants(productName) {
+        currentView = 'VARIANTS';
+        lastSelectedProductName = productName;
+
+        document.getElementById('backBtn').style.display = 'block';
+        document.getElementById('productGrid').style.display = 'none';
+        document.getElementById('categoryGrid').style.display = 'grid';
+        document.getElementById('detailView').style.display = 'none';
+
+        if (tg && tg.MainButton) tg.MainButton.hide();
+
+        const container = document.getElementById('categoryGrid');
+        container.innerHTML = '';
+
+        const matchedItems = productsDatabase.filter(p => p.name === productName);
+
+        matchedItems.forEach((item, index) => {
+            const cardNum = (index + 1) < 10 ? '0' + (index + 1) : (index + 1);
+            const logoSrc = getSvgInitialsLogo(item.name);
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="card-number">${cardNum}</div>
+                <div class="card-img-wrap">
+                    <img src="${logoSrc}" alt="${item.type}">
+                </div>
+                <h3>${item.type}</h3>
+                <div class="duration">⏱ ${item.duration}</div>
+                <div class="price">${item.priceText}</div>
+                <div class="card-footer-ornament">👑</div>
+            `;
+            card.onclick = () => showDetail(item);
+            container.appendChild(card);
+        });
+    }
+
+    function showDetail(product) {
+        currentView = 'DETAIL';
+        selectedProductData = product;
+
+        document.getElementById('productGrid').style.display = 'none';
+        document.getElementById('categoryGrid').style.display = 'none';
+        document.getElementById('detailView').style.display = 'block';
+        document.getElementById('backBtn').style.display = 'block';
+
+        const logoImg = document.getElementById('detailLogo');
+        logoImg.src = getSvgInitialsLogo(product.name);
+
+        document.getElementById('productTitle').innerText = `${product.name} - ${product.type}`;
+        document.getElementById('productDuration').innerText = `⏱ ${product.duration}`;
+        document.getElementById('productPrice').innerText = product.priceText;
+
+        const noteBox = document.getElementById('noteBox');
+        if (product.note && product.note !== "-") {
+            noteBox.innerHTML = `📌 <b>Condition / Note:</b><br>${product.note}`;
+            noteBox.style.display = 'block';
+        } else {
+            noteBox.style.display = 'none';
+        }
+
+        if (tg && tg.MainButton) {
+            document.getElementById('webSubmitBtn').style.display = 'none';
+            tg.MainButton.setText(`ORDER NOW (${product.priceText})`);
+            tg.MainButton.show();
+            tg.MainButton.offClick(sendOrder);
+            tg.MainButton.onClick(sendOrder);
+        } else {
+            const webBtn = document.getElementById('webSubmitBtn');
+            webBtn.innerText = `ORDER NOW (${product.priceText})`;
+            webBtn.style.display = 'block';
+        }
+    }
+
+    function goBack() {
+        if (currentView === 'DETAIL') {
+            showVariants(lastSelectedProductName);
+        } else if (currentView === 'VARIANTS') {
+            renderMainProducts();
+        }
+    }
+
+    function sendOrder() {
+        if (!selectedProductData) return;
+
+        const userInput = document.getElementById('accountData').value.trim() || "-";
+        const orderId = `ORD-${Math.floor(100000000 + Math.random() * 900000000)}`;
+
+        const orderData = {
+            order_id: orderId,
+            full_item_name: `${selectedProductData.name} - ${selectedProductData.type} (${selectedProductData.duration})`,
+            price: String(selectedProductData.priceText).replace(/[^0-9]/g, ''),
+            cost_price: selectedProductData.costPrice,
+            product_note: selectedProductData.note,
+            customer_note: userInput
+        };
+
+        if (tg && tg.sendData) {
+            try {
+                tg.sendData(JSON.stringify(orderData));
+                tg.close();
+            } catch(e) {
+                console.error("Telegram sendData error:", e);
+            }
+        } else {
+            alert("Order Submitted (Browser Preview):\n\n" + JSON.stringify(orderData, null, 2));
+        }
+    }
+
+    // Init App & Fetch Data on Load
+    window.addEventListener("DOMContentLoaded", () => {
+        loadProductsFromSheet();
+    });
+</script>
 </body>
-</html>
-
-ဒီ code က ui တေဘာတေနဲ့ ပေါင်းချင် အဲ့ကျ google sheete မှာ update လုပ်တာနဲ့ web app မှာပါ update ဖြစ်ပြီမလား
+</html> 
