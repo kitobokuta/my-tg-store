@@ -301,7 +301,7 @@
 <!-- Dynamic Status Box -->
 <div id="loadingBox" class="loading-box">
     <div class="spinner"></div>
-    <div>Google Sheet မှ Data များကို ရယူနေပါသည်...</div>
+    <div>Loading...</div>
 </div>
 
 <div id="productGrid" class="grid" style="display: none;"></div>
@@ -384,7 +384,7 @@
         loadingBox.style.display = 'block';
         loadingBox.innerHTML = `
             <div class="spinner"></div>
-            <div>Google Sheet မှ Data များကို ရယူနေပါသည်...</div>
+            <div>Loading...</div>
         `;
 
         try {
@@ -397,7 +397,7 @@
             const rawList = Array.isArray(data) ? data : (data.products || data.data || []);
             
             if (rawList.length === 0) {
-                loadingBox.innerHTML = `<div>မည့်သည့် Product မှ မတွေ့ရှိပါ သို့မဟုတ် Google Sheet Data လွတ်နေပါသည်။</div>`;
+                loadingBox.innerHTML = `<div>Warning:Error!</div>`;
                 return;
             }
 
@@ -409,8 +409,8 @@
             console.error("Fetch Error:", error);
             loadingBox.innerHTML = `
                 <div style="color: #ff4757; font-weight: bold; margin-bottom: 8px;">Data ရယူ၍ မရရှိပါ!</div>
-                <div style="font-size: 12px;">အင်တာနက် သို့မဟုတ် Google Sheet Link ကို စစ်ဆေးပေးပါ။</div>
-                <button class="retry-btn" onclick="loadProductsFromSheet()">ပြန်လည်ကြိုးစားရန်</button>
+                <div style="font-size: 12px;">Please check your network!</div>
+                <button class="retry-btn" onclick="loadProductsFromSheet()">Try agian!</button>
             `;
         }
     }
