@@ -28,6 +28,13 @@
             padding: 12px;
             box-sizing: border-box;
             min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .store-header { text-align: center; margin-bottom: 16px; position: relative; }
@@ -67,9 +74,13 @@
             font-weight: 700;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
             white-space: nowrap;
+        }
+        .tab-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.04);
         }
         .tab-btn.active {
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
@@ -79,21 +90,90 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
 
+        /* --- Fixed Back Button --- */
+        .back-btn-wrapper {
+            position: sticky;
+            top: 8px;
+            z-index: 100;
+            margin-bottom: 16px;
+        }
         .back-btn {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             color: #ffffff;
             font-size: 12px;
             cursor: pointer;
             padding: 8px 16px;
             border-radius: 20px;
-            margin-bottom: 16px;
-            display: none;
             font-weight: 600;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            transition: all 0.2s ease;
+        }
+        .back-btn:active {
+            transform: scale(0.95);
+            background: rgba(30, 41, 59, 0.95);
         }
 
-        .loading { text-align: center; padding: 40px 0; color: var(--hint-color); font-size: 13px; }
+        /* --- Jupiter Orbit Loading Animation --- */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 0;
+            gap: 16px;
+        }
+        .jupiter-orbit-loader {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .loader-planet {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #cfd8dc 0%, #78909c 50%, #263238 100%);
+            box-shadow: 0 0 10px rgba(120, 144, 156, 0.5);
+            z-index: 2;
+        }
+        .loader-ring {
+            position: absolute;
+            width: 66px;
+            height: 66px;
+            border: 2px dashed rgba(255, 255, 255, 0.35);
+            border-radius: 50%;
+            animation: spinRing 1.8s linear infinite;
+            z-index: 1;
+        }
+        .loader-moon {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background: #ffffff;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 8px #ffffff;
+        }
+        @keyframes spinRing {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text {
+            font-size: 12px;
+            color: var(--hint-color);
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* --- Grid & Cards with Smooth Motion --- */
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 24px; }
 
         .card {
@@ -105,14 +185,23 @@
             cursor: pointer;
             box-shadow: 0 6px 16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15);
             border: 1px solid #30363d;
-            transition: transform 0.15s ease;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease, box-shadow 0.2s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
+            animation: cardAppear 0.35s ease backwards;
         }
-        .card:active { transform: scale(0.96); border-color: #58a6ff; }
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card:hover {
+            border-color: rgba(88, 166, 255, 0.5);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25);
+        }
+        .card:active { transform: scale(0.95); border-color: #58a6ff; }
 
         /* Inactive Card Styling */
         .card.is-inactive {
@@ -137,6 +226,11 @@
             border: 2px solid rgba(255,255,255,0.2);
             display: flex; align-items: center; justify-content: center;
             margin-top: 4px; margin-bottom: 8px; overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .card:hover .card-img-wrap {
+            transform: scale(1.05);
+            border-color: rgba(255,255,255,0.4);
         }
         .card img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
         .card h3 { margin: 0; font-size: 12px; font-weight: 700; color: #f0f6fc; word-break: break-word; line-height: 1.2; }
@@ -147,8 +241,10 @@
         .card-footer-ornament::before, .card-footer-ornament::after { content: "—"; color: #30363d; }
 
         .detail-view { 
-            display: none; background: linear-gradient(145deg, #161b22 0%, #0d1117 100%); 
+            display: none; background: linear-gradient(145deg, #161b22 0%, #0d1117.5 100%); 
             padding: 20px 14px; border-radius: 14px; border: 1px solid #30363d; text-align: center;
+            animation: fadeIn 0.3s ease-out;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
         }
         .detail-img-wrap {
             width: 70px; height: 70px; border-radius: 50%;
@@ -172,7 +268,8 @@
 
         .input-group { margin-top: 14px; text-align: left; }
         .input-group label { font-size: 10px; color: var(--hint-color); display: block; margin-bottom: 4px; }
-        .input-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: #ffffff; box-sizing: border-box; font-size: 13px; outline: none; }
+        .input-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: #ffffff; box-sizing: border-box; font-size: 13px; outline: none; transition: border-color 0.2s ease; }
+        .input-group input:focus { border-color: #3b82f6; }
 
         .trust-footer {
             margin-top: 20px; background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
@@ -206,8 +303,21 @@
     <button class="tab-btn" id="tabGame" onclick="switchTab('GAME')">Game Item</button>
 </div>
 
-<button id="backBtn" class="back-btn" onclick="goBack()">← Back</button>
-<div id="loading" class="loading">Loading products from Google Sheet...</div>
+<!-- Fixed Back Button Container -->
+<div class="back-btn-wrapper">
+    <button id="backBtn" class="back-btn" onclick="goBack()">← Back</button>
+</div>
+
+<!-- Jupiter Orbit Loading Graphic -->
+<div id="loading" class="loading-container">
+    <div class="jupiter-orbit-loader">
+        <div class="loader-ring">
+            <div class="loader-moon"></div>
+        </div>
+        <div class="loader-planet"></div>
+    </div>
+    <div class="loading-text">Loading Universe...</div>
+</div>
 
 <div id="productGrid" class="grid"></div>
 <div id="categoryGrid" class="grid" style="display: none;"></div>
@@ -225,7 +335,7 @@
     <div id="noteBox" class="note-box" style="display:none;"></div>
     
     <div id="unavailMsg" class="unavailable-msg" style="display:none;">
-        ⚠️ လက်ရှိ ပစ္စည်းပြတ်လပ်နေပါသည် (Unavailable)
+        ⚠️ လက်ရှိ ပစ္စည်းပြတ်လပ်နေပါသည်။ (Unavailable)
     </div>
 
     <div id="inputForm" class="input-group">
@@ -243,10 +353,13 @@
 
 <script>
     const tg = window.Telegram.WebApp;
-    try { tg.expand(); } catch(e){}
+    try { 
+        tg.ready();
+        tg.expand(); 
+    } catch(e){}
 
     const BOT_TOKEN = "8872507193:AAFzPJBbCG2pjLtBDvtSakBUqEYKLbHdGks";
-    const API_URL = "https://script.google.com/macros/s/AKfycbzk1iBnjxqXUQe1_c1qN3mUcEpB2d6Pt7LlA3DEGjBAafW6TH3dW23zqiOjw-bbQJy_/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzsjpgTAxX3ii_Pw2mRt6kmAEaOp1oa9Im5GJ2VBPhqnPMmwGJjiYU4Y1CjIBNWgRgV/exec";
     const QR_IMAGE_URL = "https://kitobokuta.github.io/digital-product-ui/qr.jpg";
 
     let rawData = [];
@@ -276,8 +389,6 @@
         document.getElementById('tabService').classList.toggle('active', tabType === 'SERVICE');
         document.getElementById('tabGame').classList.toggle('active', tabType === 'GAME');
         
-        document.getElementById('categoryGrid').style.display = 'none';
-        document.getElementById('detailView').style.display = 'none';
         showProducts();
     }
 
@@ -316,7 +427,7 @@
             showProducts();
         } catch (error) {
             console.error("Fetch error:", error);
-            document.getElementById('loading').innerHTML = "Data ရယူ၍ မရနိုင်ပါ။";
+            document.getElementById('loading').innerHTML = `<div style="color: var(--hint-color); font-size: 12px; text-align: center;">Data ရယူ၍ မရနိုင်ပါ။</div>`;
         }
     }
 
@@ -364,6 +475,7 @@
 
             const card = document.createElement('div');
             card.className = 'card';
+            card.style.animationDelay = `${(index - 1) * 0.04}s`;
             card.innerHTML = `
                 <div class="card-number">${index < 10 ? '0' + index : index}</div>
                 <div class="card-img-wrap">
@@ -385,10 +497,11 @@
 
         if (matchedItems.length > 0) {
             document.getElementById('tabContainer').style.display = 'none';
-            document.getElementById('backBtn').style.display = 'block';
+            document.getElementById('backBtn').style.display = 'inline-block';
             document.getElementById('productGrid').style.display = 'none';
             document.getElementById('categoryGrid').style.display = 'grid';
             document.getElementById('detailView').style.display = 'none';
+            try { tg.MainButton.hide(); } catch(e){}
 
             const container = document.getElementById('categoryGrid');
             container.innerHTML = '';
@@ -405,6 +518,7 @@
 
                 const card = document.createElement('div');
                 card.className = `card ${isInactive ? 'is-inactive' : ''}`;
+                card.style.animationDelay = `${index * 0.04}s`;
                 card.innerHTML = `
                     <div class="card-number">${(index + 1) < 10 ? '0' + (index + 1) : (index + 1)}</div>
                     <div class="card-img-wrap">
@@ -418,6 +532,7 @@
                 card.onclick = () => showDetail(item);
                 container.appendChild(card);
             });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
 
@@ -425,6 +540,7 @@
         currentView = 'DETAIL';
         selectedProduct = product;
         document.getElementById('tabContainer').style.display = 'none';
+        document.getElementById('backBtn').style.display = 'inline-block';
         document.getElementById('productGrid').style.display = 'none';
         document.getElementById('categoryGrid').style.display = 'none';
         document.getElementById('detailView').style.display = 'block';
@@ -435,7 +551,6 @@
         const prodDuration = getProp(product, ["duration", "time"]);
         const prodDesc = getProp(product, ["description", "desc"]);
         
-        // Status Check
         const prodStatus = (getProp(product, ["status", "stat"]) || 'Active').toLowerCase();
         const isInactive = prodStatus === 'inactive';
 
@@ -452,7 +567,6 @@
             noteBox.style.display = 'none';
         }
 
-        // Inactive ဖြစ်ရင် Button ဖျောက်ပြီး Form ပိတ်ထားမည်
         const unavailMsg = document.getElementById('unavailMsg');
         const inputForm = document.getElementById('inputForm');
 
@@ -470,11 +584,15 @@
                 tg.MainButton.onClick(sendOrder);
             } catch(e){}
         }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function goBack() {
-        if (currentView === 'DETAIL') showVariants(lastSelectedProductName);
-        else if (currentView === 'VARIANTS') showProducts();
+        if (currentView === 'DETAIL') {
+            showVariants(lastSelectedProductName);
+        } else if (currentView === 'VARIANTS') {
+            showProducts();
+        }
     }
 
     async function sendOrder() {
