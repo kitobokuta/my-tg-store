@@ -38,7 +38,7 @@
         }
 
         .store-header { text-align: center; margin-bottom: 16px; position: relative; }
-        .planet-icon { width: 75px; height: auto; margin-bottom: -10px; filter: drop-shadow(0 0 15px rgba(139, 155, 180, 0.5)); }
+        .planet-icon { width: 75px; height: auto; margin-bottom: -10px; filter: drop-shadow(0 0 15px rgba(139, 155, 180, 0.5)); transform: rotate(30deg); }
         h1.store-title {
             font-family: "Cinzel", "Times New Roman", serif;
             font-size: 26px;
@@ -76,7 +76,6 @@
             font-weight: 700;
             border-radius: 10px;
             cursor: pointer;
-            /* Cubic-bezier ဖြင့် ပိုမို Smooth ဖြစ်စေရန် ပြုလုပ်ထားခြင်း */
             transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
                         background 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
                         box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
@@ -222,7 +221,6 @@
         }
         .card:active { transform: scale(0.95); border-color: #58a6ff; }
 
-        /* Inactive Card Styling */
         .card.is-inactive {
             opacity: 0.6;
             filter: grayscale(0.6);
@@ -301,7 +299,7 @@
 <body>
 
 <div class="store-header">
-    <svg class="planet-icon" viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
+    <svg class="planet-icon" viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg" style="transform: rotate(45deg);">
         <g transform="rotate(-10 100 65)">
             <ellipse cx="100" cy="65" rx="90" ry="28" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="4"/>
             <circle cx="100" cy="65" r="42" fill="url(#headerPlanetGrad)" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
