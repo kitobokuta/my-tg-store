@@ -76,6 +76,7 @@
             font-weight: 700;
             border-radius: 10px;
             cursor: pointer;
+            /* Cubic-bezier ဖြင့် ပိုမို Smooth ဖြစ်စေရန် ပြုလုပ်ထားခြင်း */
             transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
                         background 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
                         box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
@@ -126,7 +127,7 @@
             background: rgba(30, 41, 59, 0.95);
         }
 
-        /* --- Jupiter 3D Side-Perspective Orbit Loading Graphic (135deg rotated) --- */
+        /* --- Jupiter 3D Side-Perspective Orbit Loading Graphic --- */
         .loading-container {
             display: flex;
             flex-direction: column;
@@ -137,27 +138,26 @@
         }
         .jupiter-orbit-loader {
             position: relative;
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
             display: flex;
             align-items: center;
             justify-content: center;
-            perspective: 400px;
-            transform: rotate(135deg);
+            perspective: 300px;
         }
         .loader-planet {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #facc15 0%, #ea580c 50%, #7c2d12 100%);
-            box-shadow: 0 0 20px rgba(234, 88, 12, 0.7), inset -5px -5px 10px rgba(0,0,0,0.8);
+            background: radial-gradient(circle at 30% 30%, #e2e8f0 0%, #64748b 50%, #0f172a 100%);
+            box-shadow: 0 0 15px rgba(100, 116, 139, 0.6), inset -4px -4px 8px rgba(0,0,0,0.8);
             z-index: 2;
         }
         .loader-ring-system {
             position: absolute;
-            width: 96px;
-            height: 96px;
-            transform: rotateX(72deg);
+            width: 86px;
+            height: 86px;
+            transform: rotateX(70deg);
             transform-style: preserve-3d;
             animation: spin3D 2.2s linear infinite;
             z-index: 3;
@@ -165,23 +165,23 @@
         .loader-ring-back {
             position: absolute;
             inset: 0;
-            border: 2px dashed rgba(250, 204, 21, 0.4);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
             border-radius: 50%;
         }
         .loader-moon {
             position: absolute;
-            top: -6px;
+            top: -5px;
             left: 50%;
-            width: 12px;
-            height: 12px;
-            background: #fef08a;
+            width: 10px;
+            height: 10px;
+            background: #ffffff;
             border-radius: 50%;
             transform: translateX(-50%);
-            box-shadow: 0 0 12px #facc15, 0 0 6px #ea580c;
+            box-shadow: 0 0 10px #ffffff, 0 0 4px #3b82f6;
         }
         @keyframes spin3D {
-            0% { transform: rotateX(72deg) rotateZ(0deg); }
-            100% { transform: rotateX(72deg) rotateZ(360deg); }
+            0% { transform: rotateX(68deg) rotateZ(0deg); }
+            100% { transform: rotateX(68deg) rotateZ(360deg); }
         }
         .loading-text {
             font-size: 11px;
@@ -222,6 +222,7 @@
         }
         .card:active { transform: scale(0.95); border-color: #58a6ff; }
 
+        /* Inactive Card Styling */
         .card.is-inactive {
             opacity: 0.6;
             filter: grayscale(0.6);
@@ -300,17 +301,17 @@
 <body>
 
 <div class="store-header">
-    <svg class="planet-icon" viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg" style="transform: rotate(135deg);">
+    <svg class="planet-icon" viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
         <g transform="rotate(-10 100 65)">
-            <ellipse cx="100" cy="65" rx="90" ry="28" fill="none" stroke="rgba(250,204,21,0.3)" stroke-width="4"/>
-            <circle cx="100" cy="65" r="42" fill="url(#headerPlanetGrad)" stroke="rgba(250,204,21,0.6)" stroke-width="2"/>
-            <path d="M 10 65 A 90 28 0 0 0 190 65" fill="none" stroke="rgba(254,240,138,0.8)" stroke-width="4" stroke-linecap="round"/>
+            <ellipse cx="100" cy="65" rx="90" ry="28" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="4"/>
+            <circle cx="100" cy="65" r="42" fill="url(#headerPlanetGrad)" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+            <path d="M 10 65 A 90 28 0 0 0 190 65" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="4" stroke-linecap="round"/>
         </g>
         <defs>
             <radialGradient id="headerPlanetGrad" cx="30%" cy="30%" r="70%">
-                <stop offset="0%" stop-color="#fef08a"/>
-                <stop offset="50%" stop-color="#ea580c"/>
-                <stop offset="100%" stop-color="#7c2d12"/>
+                <stop offset="0%" stop-color="#e2e8f0"/>
+                <stop offset="50%" stop-color="#64748b"/>
+                <stop offset="100%" stop-color="#0f172a"/>
             </radialGradient>
         </defs>
     </svg>
@@ -329,7 +330,7 @@
     <button id="backBtn" class="back-btn" onclick="goBack()">← Back</button>
 </div>
 
-<!-- Jupiter 3D Side-Perspective Orbit Loading Graphic (135deg rotated & Jupiter-themed) -->
+<!-- Jupiter 3D Side-Perspective Orbit Loading Graphic -->
 <div id="loading" class="loading-container">
     <div class="jupiter-orbit-loader">
         <div class="loader-ring-system">
