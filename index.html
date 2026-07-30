@@ -33,30 +33,12 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .store-header { text-align: center; margin-bottom: 16px; position: relative; }
-        
-        /* --- Glitch Graphic Jupiter with 45-degree Orbit --- */
-        .planet-icon { 
-            width: 75px; 
-            height: auto; 
-            margin-bottom: -10px; 
-            filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.6)) drop-shadow(2px -2px 0px rgba(255, 71, 87, 0.5));
-            animation: glitchHeader 3s infinite steps(2, end);
-        }
-        @keyframes glitchHeader {
-            0% { transform: translate(0); }
-            20% { transform: translate(-1px, 1px); filter: drop-shadow(-2px 0px rgba(255, 71, 87, 0.8)) drop-shadow(2px 0px rgba(0, 243, 255, 0.8)); }
-            22% { transform: translate(0); }
-            70% { transform: translate(0); }
-            72% { transform: translate(1px, -1px); filter: drop-shadow(2px 0px rgba(255, 71, 87, 0.8)) drop-shadow(-2px 0px rgba(0, 243, 255, 0.8)); }
-            74% { transform: translate(0); }
-            100% { transform: translate(0); }
-        }
-
+        .planet-icon { width: 75px; height: auto; margin-bottom: -10px; filter: drop-shadow(0 0 15px rgba(139, 155, 180, 0.5)); }
         h1.store-title {
             font-family: "Cinzel", "Times New Roman", serif;
             font-size: 26px;
@@ -70,7 +52,7 @@
         }
         .store-subtitle { font-size: 9px; letter-spacing: 2px; color: #b0bec5; text-transform: uppercase; margin-top: 4px; font-weight: 600; }
 
-        /* --- Jump-Free iOS Smooth Tab Switcher --- */
+        /* --- Ultra-Smooth Tab Switcher --- */
         .tab-container {
             display: flex;
             width: 100%;
@@ -94,8 +76,11 @@
             font-weight: 700;
             border-radius: 10px;
             cursor: pointer;
-            /* Jump များကို လုံးဝဖျောက်ကာ iOS လို Smooth ဖြစ်စေရန် transition သီးသန့်သုံးထားခြင်း */
-            transition: color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+            /* Cubic-bezier ဖြင့် ပိုမို Smooth ဖြစ်စေရန် ပြုလုပ်ထားခြင်း */
+            transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        background 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                        box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
             text-align: center;
             white-space: nowrap;
             z-index: 2;
@@ -103,6 +88,9 @@
         .tab-btn:hover {
             color: #ffffff;
             background: rgba(255, 255, 255, 0.03);
+        }
+        .tab-btn:active {
+            transform: scale(0.96);
         }
         .tab-btn.active {
             background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
@@ -139,7 +127,7 @@
             background: rgba(30, 41, 59, 0.95);
         }
 
-        /* --- Glitch Graphic Loader with 45-degree Orbit (No Moon) --- */
+        /* --- Jupiter 3D Side-Perspective Orbit Loading Graphic --- */
         .loading-container {
             display: flex;
             flex-direction: column;
@@ -164,36 +152,36 @@
             background: radial-gradient(circle at 30% 30%, #e2e8f0 0%, #64748b 50%, #0f172a 100%);
             box-shadow: 0 0 15px rgba(100, 116, 139, 0.6), inset -4px -4px 8px rgba(0,0,0,0.8);
             z-index: 2;
-            animation: glitchPlanet 2s infinite steps(3, end);
-        }
-        @keyframes glitchPlanet {
-            0% { clip-path: inset(0 0 0 0); }
-            20% { clip-path: inset(20% 0 30% 0); transform: translate(-2px, 1px); }
-            40% { clip-path: inset(0 0 0 0); transform: translate(0); }
-            80% { clip-path: inset(50% 0 10% 0); transform: translate(2px, -1px); }
-            100% { clip-path: inset(0 0 0 0); }
         }
         .loader-ring-system {
             position: absolute;
             width: 86px;
             height: 86px;
-            /* 45 Degree Fixed Tilt with Glitch Spin */
-            transform: rotateX(55deg) rotateY(45deg);
+            transform: rotateX(70deg);
             transform-style: preserve-3d;
-            animation: spinGlitchOrbit 2s linear infinite;
+            animation: spin3D 2.2s linear infinite;
             z-index: 3;
         }
         .loader-ring-back {
             position: absolute;
             inset: 0;
-            border: 2px dashed rgba(0, 243, 255, 0.7);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
             border-radius: 50%;
-            box-shadow: 0 0 8px rgba(255, 71, 87, 0.5);
         }
-        @keyframes spinGlitchOrbit {
-            0% { transform: rotateX(55deg) rotateY(45deg) rotateZ(0deg); }
-            50% { border-color: rgba(255, 71, 87, 0.8); }
-            100% { transform: rotateX(55deg) rotateY(45deg) rotateZ(360deg); }
+        .loader-moon {
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background: #ffffff;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px #ffffff, 0 0 4px #3b82f6;
+        }
+        @keyframes spin3D {
+            0% { transform: rotateX(68deg) rotateZ(0deg); }
+            100% { transform: rotateX(68deg) rotateZ(360deg); }
         }
         .loading-text {
             font-size: 11px;
@@ -202,17 +190,9 @@
             font-weight: 700;
             text-transform: uppercase;
             text-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
-            animation: glitchText 1.5s infinite steps(2, end);
-        }
-        @keyframes glitchText {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; transform: skewX(-10deg); }
-            52% { opacity: 1; transform: skewX(10deg); }
-            54% { opacity: 0.5; transform: skewX(0); }
-            100% { opacity: 1; }
         }
 
-        /* --- Grid & Cards --- */
+        /* --- Grid & Cards with Smooth Motion --- */
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 24px; }
 
         .card {
@@ -224,19 +204,25 @@
             cursor: pointer;
             box-shadow: 0 6px 16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15);
             border: 1px solid #30363d;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease, box-shadow 0.2s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
+            animation: cardAppear 0.35s ease backwards;
+        }
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .card:hover {
             border-color: rgba(88, 166, 255, 0.5);
             box-shadow: 0 8px 22px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25);
         }
-        .card:active { border-color: #58a6ff; }
+        .card:active { transform: scale(0.95); border-color: #58a6ff; }
 
+        /* Inactive Card Styling */
         .card.is-inactive {
             opacity: 0.6;
             filter: grayscale(0.6);
@@ -259,6 +245,11 @@
             border: 2px solid rgba(255,255,255,0.2);
             display: flex; align-items: center; justify-content: center;
             margin-top: 4px; margin-bottom: 8px; overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .card:hover .card-img-wrap {
+            transform: scale(1.05);
+            border-color: rgba(255,255,255,0.4);
         }
         .card img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
         .card h3 { margin: 0; font-size: 12px; font-weight: 700; color: #f0f6fc; word-break: break-word; line-height: 1.2; }
@@ -271,6 +262,7 @@
         .detail-view { 
             display: none; background: linear-gradient(145deg, #161b22 0%, #0d1117.5 100%); 
             padding: 20px 14px; border-radius: 14px; border: 1px solid #30363d; text-align: center;
+            animation: fadeIn 0.3s ease-out;
             box-shadow: 0 8px 24px rgba(0,0,0,0.6);
         }
         .detail-img-wrap {
@@ -309,12 +301,11 @@
 <body>
 
 <div class="store-header">
-    <!-- 45-Degree Glitch Orbit Jupiter SVG (No Moon) -->
     <svg class="planet-icon" viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
-        <g transform="rotate(45 100 65)">
-            <ellipse cx="100" cy="65" rx="85" ry="24" fill="none" stroke="rgba(0, 243, 255, 0.6)" stroke-width="3" stroke-dasharray="6 3"/>
-            <circle cx="100" cy="65" r="38" fill="url(#headerPlanetGrad)" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
-            <path d="M 15 65 A 85 24 0 0 0 185 65" fill="none" stroke="rgba(255, 71, 87, 0.8)" stroke-width="3" stroke-linecap="round"/>
+        <g transform="rotate(-10 100 65)">
+            <ellipse cx="100" cy="65" rx="90" ry="28" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="4"/>
+            <circle cx="100" cy="65" r="42" fill="url(#headerPlanetGrad)" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+            <path d="M 10 65 A 90 28 0 0 0 190 65" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="4" stroke-linecap="round"/>
         </g>
         <defs>
             <radialGradient id="headerPlanetGrad" cx="30%" cy="30%" r="70%">
@@ -339,11 +330,13 @@
     <button id="backBtn" class="back-btn" onclick="goBack()">← Back</button>
 </div>
 
-<!-- Glitch Loader with 45-Degree Orbit (No Moon) -->
+<!-- Jupiter 3D Side-Perspective Orbit Loading Graphic -->
 <div id="loading" class="loading-container">
     <div class="jupiter-orbit-loader">
         <div class="loader-ring-system">
-            <div class="loader-ring-back"></div>
+            <div class="loader-ring-back">
+                <div class="loader-moon"></div>
+            </div>
         </div>
         <div class="loader-planet"></div>
     </div>
@@ -421,7 +414,6 @@
         document.getElementById('tabGame').classList.toggle('active', tabType === 'GAME');
         
         showProducts();
-        window.scrollTo({ top: 0, behavior: 'instant' });
     }
 
     function getSvgInitialsLogo(text) {
@@ -456,28 +448,7 @@
             const response = await fetch(timestampUrl, { redirect: "follow" });
             rawData = await response.json();
             document.getElementById('loading').style.display = 'none';
-            
-            // Check session storage for previous state restoration
-            const savedState = sessionStorage.getItem('jupiter_state');
-            if (savedState) {
-                const state = JSON.parse(savedState);
-                sessionStorage.removeItem('jupiter_state');
-                currentTab = state.tab || 'PREMIUM';
-                document.getElementById('tabPremium').classList.toggle('active', currentTab === 'PREMIUM');
-                document.getElementById('tabService').classList.toggle('active', currentTab === 'SERVICE');
-                document.getElementById('tabGame').classList.toggle('active', currentTab === 'GAME');
-
-                if (state.view === 'VARIANTS' && state.productName) {
-                    showVariants(state.productName, false);
-                } else {
-                    showProducts();
-                }
-                setTimeout(() => {
-                    window.scrollTo({ top: state.scroll || 0, behavior: 'instant' });
-                }, 50);
-            } else {
-                showProducts();
-            }
+            showProducts();
         } catch (error) {
             console.error("Fetch error:", error);
             document.getElementById('loading').innerHTML = `<div style="color: var(--hint-color); font-size: 12px; text-align: center;">Data ရယူ၍ မရနိုင်ပါ။</div>`;
@@ -528,6 +499,7 @@
 
             const card = document.createElement('div');
             card.className = 'card';
+            card.style.animationDelay = `${(index - 1) * 0.04}s`;
             card.innerHTML = `
                 <div class="card-number">${index < 10 ? '0' + index : index}</div>
                 <div class="card-img-wrap">
@@ -536,22 +508,13 @@
                 <h3>${prodName}</h3>
                 <div class="card-footer-ornament">👑</div>
             `;
-            card.onclick = () => showVariants(prodName, true);
+            card.onclick = () => showVariants(prodName);
             container.appendChild(card);
             index++;
         });
     }
 
-    function showVariants(prodName, saveScroll = true) {
-        if (saveScroll) {
-            sessionStorage.setItem('jupiter_state', JSON.stringify({
-                view: 'VARIANTS',
-                tab: currentTab,
-                productName: prodName,
-                scroll: window.scrollY
-            }));
-        }
-
+    function showVariants(prodName) {
         currentView = 'VARIANTS';
         lastSelectedProductName = prodName;
         const matchedItems = rawData.filter(i => getProp(i, ["name", "title"]) === prodName);
@@ -579,6 +542,7 @@
 
                 const card = document.createElement('div');
                 card.className = `card ${isInactive ? 'is-inactive' : ''}`;
+                card.style.animationDelay = `${index * 0.04}s`;
                 card.innerHTML = `
                     <div class="card-number">${(index + 1) < 10 ? '0' + (index + 1) : (index + 1)}</div>
                     <div class="card-img-wrap">
@@ -592,7 +556,7 @@
                 card.onclick = () => showDetail(item);
                 container.appendChild(card);
             });
-            window.scrollTo({ top: 0, behavior: 'instant' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
 
@@ -644,13 +608,12 @@
                 tg.MainButton.onClick(sendOrder);
             } catch(e){}
         }
-        window.scrollTo({ top: 0, behavior: 'instant' });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function goBack() {
-        sessionStorage.removeItem('jupiter_state');
         if (currentView === 'DETAIL') {
-            showVariants(lastSelectedProductName, false);
+            showVariants(lastSelectedProductName);
         } else if (currentView === 'VARIANTS') {
             showProducts();
         }
