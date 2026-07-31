@@ -515,19 +515,23 @@
 
             if (!prodName) return;
 
-            let isMatchedTab = false;
-            if (currentTab === 'PREMIUM' && (sheetType === "Products Master Database" || sheetType === "Premium")) isMatchedTab = true;
-            if (currentTab === 'SERVICE' && sheetType === "Log in Service") isMatchedTab = true;
-            if (currentTab === 'GAME' && sheetType === "Game Items") isMatchedTab = true;
+            const nameLower = prodName.toLowerCase();
 
-            if (isMatchedTab) {
-                // Modified to check if product name or category STARTS WITH the query string (.startsWith instead of .includes)
-                const nameLower = prodName.toLowerCase();
-                const catLower = (prodCat || "").toLowerCase();
-                
-                const matchesQuery = query === "" || nameLower.startsWith(query) || catLower.startsWith(query);
+            if (query === "") {
+                // If search is empty, filter strictly by current selected tab
+                let isMatchedTab = false;
+                if (currentTab === 'PREMIUM' && (sheetType === "Products Master Database" || sheetType === "Premium")) isMatchedTab = true;
+                if (currentTab === 'SERVICE' && sheetType === "Log in Service") isMatchedTab = true;
+                if (currentTab === 'GAME' && sheetType === "Game Items") isMatchedTab = true;
 
-                if (matchesQuery) {
+                if (isMatchedTab) {
+                    if (!uniqueProductsMap.has(prodName)) {
+                        uniqueProductsMap.set(prodName, prod);
+                    }
+                }
+            } else {
+                // When searching, cross-search across ALL tabs using startsWith matching on product names only
+                if (nameLower.startsWith(query)) {
                     if (!uniqueProductsMap.has(prodName)) {
                         uniqueProductsMap.set(prodName, prod);
                     }
@@ -581,9 +585,7 @@
             if (!nameMatch) return false;
             if (query === "") return true;
             const itemCat = (getProp(i, ["category", "cat"]) || prodName).toLowerCase();
-            const itemDuration = (getProp(i, ["duration", "time"]) || "").toLowerCase();
-            // Prefix matching for variants as well
-            return itemCat.startsWith(query) || itemDuration.startsWith(query);
+            return itemCat.startsWith(query);
         });
 
         if (matchedItems.length >= 0) {
@@ -689,6 +691,7 @@
             document.getElementById('searchInput').value = '';
             showVariants(lastSelectedProductName);
         } else if (currentView === 'VARIANTS') {
+            document.getElementById('searchInput').value = '`'; // small trick to reset view
             document.getElementById('searchInput').value = '';
             showProducts();
         }
@@ -719,7 +722,7 @@
             try {
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'Application/json' },
                     body: JSON.stringify({
                         chat_id: chatId,
                         photo: QR_IMAGE_URL,
