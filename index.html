@@ -38,7 +38,7 @@
         }
 
         .store-header { text-align: center; margin-bottom: 16px; position: relative; }
-        .planet-icon { width: 75px; height: auto; margin-bottom: -10px; filter: drop-shadow(0 0 15px rgba(139, 155, 180, 0.5)); transform: rotate(60deg); }
+        .planet-icon { width: 75px; height: auto; margin-bottom: -10px; filter: drop-shadow(0 0 15px rgba(139, 155, 180, 0.5)); transform: rotate(30deg); }
         h1.store-title {
             font-family: "Cinzel", "Times New Roman", serif;
             font-size: 26px;
@@ -51,6 +51,38 @@
             text-shadow: 0 4px 15px rgba(0,0,0,0.8);
         }
         .store-subtitle { font-size: 9px; letter-spacing: 2px; color: #b0bec5; text-transform: uppercase; margin-top: 4px; font-weight: 600; }
+
+        /* --- Search Bar Styling --- */
+        .search-container {
+            margin-bottom: 14px;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            padding: 11px 14px 11px 38px;
+            border-radius: 12px;
+            border: 1px solid #1e293b;
+            background: #0b1120;
+            color: #ffffff;
+            font-size: 13px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+        }
+        .search-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.25), inset 0 2px 4px rgba(0,0,0,0.6);
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: var(--hint-color);
+            pointer-events: none;
+        }
 
         /* --- Ultra-Smooth Tab Switcher --- */
         .tab-container {
@@ -317,6 +349,12 @@
     <div class="store-subtitle">✦ PREMIUM DIGITAL PRODUCTS ✦</div>
 </div>
 
+<!-- Search Bar -->
+<div class="search-container" id="searchContainer">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" class="search-input" placeholder="search now..." oninput="handleSearch()">
+</div>
+
 <div id="tabContainer" class="tab-container">
     <button class="tab-btn active" id="tabPremium" onclick="switchTab('PREMIUM')">Premium</button>
     <button class="tab-btn" id="tabService" onclick="switchTab('SERVICE')">Log in Service</button>
@@ -411,6 +449,8 @@
         document.getElementById('tabService').classList.toggle('active', tabType === 'SERVICE');
         document.getElementById('tabGame').classList.toggle('active', tabType === 'GAME');
         
+        // Clear search input when switching tabs if desired, or keep it. Let's keep it clean:
+        document.getElementById('searchInput').value = '';
         showProducts();
     }
 
@@ -453,8 +493,9 @@
         }
     }
 
-    function showProducts() {
+    function showProducts(searchQuery = "") {
         currentView = 'PRODUCTS';
+        document.getElementById('searchContainer').style.display = 'block';
         document.getElementById('tabContainer').style.display = 'flex';
         document.getElementById('backBtn').style.display = 'none';
         document.getElementById('productGrid').style.display = 'grid';
@@ -466,10 +507,12 @@
         container.innerHTML = '';
 
         const uniqueProductsMap = new Map();
+        const query = searchQuery.trim().toLowerCase();
 
         rawData.forEach((prod) => {
             const sheetType = getProp(prod, ["sheet_type", "type"]);
             const prodName = getProp(prod, ["name", "title"]);
+            const prodCat = getProp(prod, ["category", "cat"]);
 
             if (!prodName) return;
 
@@ -479,14 +522,17 @@
             if (currentTab === 'GAME' && sheetType === "Game Items") isMatched = true;
 
             if (isMatched) {
-                if (!uniqueProductsMap.has(prodName)) {
-                    uniqueProductsMap.set(prodName, prod);
+                // Check search filter (supports matching product name or category/variants, case-insensitive e.g. n or N)
+                if (query === "" || prodName.toLowerCase().includes(query) || (prodCat && prodCat.toLowerCase().includes(query))) {
+                    if (!uniqueProductsMap.has(prodName)) {
+                        uniqueProductsMap.set(prodName, prod);
+                    }
                 }
             }
         });
 
         if (uniqueProductsMap.size === 0) {
-            container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--hint-color); padding: 30px; font-size: 12px;">ယခု Tab တွင် ပစ္စည်းများ မရှိသေးပါ။</div>`;
+            container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--hint-color); padding: 30px; font-size: 12px;">ရှာဖွေမှုနှင့် ကိုက်ညီသော ပစ္စည်းများ မရှိပါ</div>`;
             return;
         }
 
@@ -512,12 +558,31 @@
         });
     }
 
-    function showVariants(prodName) {
+    function handleSearch() {
+        const query = document.getElementById('searchInput').value;
+        if (currentView === 'PRODUCTS') {
+            showProducts(query);
+        } else if (currentView === 'VARIANTS') {
+            showVariants(lastSelectedProductName, query);
+        }
+    }
+
+    function showVariants(prodName, searchQuery = "") {
         currentView = 'VARIANTS';
         lastSelectedProductName = prodName;
-        const matchedItems = rawData.filter(i => getProp(i, ["name", "title"]) === prodName);
+        const query = searchQuery.trim().toLowerCase();
+        
+        const matchedItems = rawData.filter(i => {
+            const nameMatch = getProp(i, ["name", "title"]) === prodName;
+            if (!nameMatch) return false;
+            if (query === "") return true;
+            const itemCat = (getProp(i, ["category", "cat"]) || prodName).toLowerCase();
+            const itemDuration = (getProp(i, ["duration", "time"]) || "").toLowerCase();
+            return itemCat.includes(query) || itemDuration.includes(query);
+        });
 
-        if (matchedItems.length > 0) {
+        if (matchedItems.length >= 0) {
+            document.getElementById('searchContainer').style.display = 'block';
             document.getElementById('tabContainer').style.display = 'none';
             document.getElementById('backBtn').style.display = 'inline-block';
             document.getElementById('productGrid').style.display = 'none';
@@ -527,6 +592,11 @@
 
             const container = document.getElementById('categoryGrid');
             container.innerHTML = '';
+
+            if (matchedItems.length === 0) {
+                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--hint-color); padding: 30px; font-size: 12px;">ဤအမျိုးအစားထဲတွင် ရှာဖွေမှုနှင့် ကိုက်ညီသော ပစ္စည်းများ မရှိပါ။</div>`;
+                return;
+            }
 
             matchedItems.forEach((item, index) => {
                 const itemCat = getProp(item, ["category", "cat"]) || prodName;
@@ -554,13 +624,13 @@
                 card.onclick = () => showDetail(item);
                 container.appendChild(card);
             });
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
 
     function showDetail(product) {
         currentView = 'DETAIL';
         selectedProduct = product;
+        document.getElementById('searchContainer').style.display = 'none';
         document.getElementById('tabContainer').style.display = 'none';
         document.getElementById('backBtn').style.display = 'inline-block';
         document.getElementById('productGrid').style.display = 'none';
@@ -611,8 +681,10 @@
 
     function goBack() {
         if (currentView === 'DETAIL') {
+            document.getElementById('searchInput').value = '';
             showVariants(lastSelectedProductName);
         } else if (currentView === 'VARIANTS') {
+            document.getElementById('searchInput').value = '';
             showProducts();
         }
     }
