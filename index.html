@@ -449,7 +449,6 @@
         document.getElementById('tabService').classList.toggle('active', tabType === 'SERVICE');
         document.getElementById('tabGame').classList.toggle('active', tabType === 'GAME');
         
-        // Clear search input when switching tabs if desired, or keep it. Let's keep it clean:
         document.getElementById('searchInput').value = '';
         showProducts();
     }
@@ -516,14 +515,19 @@
 
             if (!prodName) return;
 
-            let isMatched = false;
-            if (currentTab === 'PREMIUM' && (sheetType === "Products Master Database" || sheetType === "Premium")) isMatched = true;
-            if (currentTab === 'SERVICE' && sheetType === "Log in Service") isMatched = true;
-            if (currentTab === 'GAME' && sheetType === "Game Items") isMatched = true;
+            let isMatchedTab = false;
+            if (currentTab === 'PREMIUM' && (sheetType === "Products Master Database" || sheetType === "Premium")) isMatchedTab = true;
+            if (currentTab === 'SERVICE' && sheetType === "Log in Service") isMatchedTab = true;
+            if (currentTab === 'GAME' && sheetType === "Game Items") isMatchedTab = true;
 
-            if (isMatched) {
-                // Check search filter (supports matching product name or category/variants, case-insensitive e.g. n or N)
-                if (query === "" || prodName.toLowerCase().includes(query) || (prodCat && prodCat.toLowerCase().includes(query))) {
+            if (isMatchedTab) {
+                // Modified to check if product name or category STARTS WITH the query string (.startsWith instead of .includes)
+                const nameLower = prodName.toLowerCase();
+                const catLower = (prodCat || "").toLowerCase();
+                
+                const matchesQuery = query === "" || nameLower.startsWith(query) || catLower.startsWith(query);
+
+                if (matchesQuery) {
                     if (!uniqueProductsMap.has(prodName)) {
                         uniqueProductsMap.set(prodName, prod);
                     }
@@ -578,7 +582,8 @@
             if (query === "") return true;
             const itemCat = (getProp(i, ["category", "cat"]) || prodName).toLowerCase();
             const itemDuration = (getProp(i, ["duration", "time"]) || "").toLowerCase();
-            return itemCat.includes(query) || itemDuration.includes(query);
+            // Prefix matching for variants as well
+            return itemCat.startsWith(query) || itemDuration.startsWith(query);
         });
 
         if (matchedItems.length >= 0) {
