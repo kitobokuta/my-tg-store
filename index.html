@@ -511,14 +511,11 @@
         rawData.forEach((prod) => {
             const sheetType = getProp(prod, ["sheet_type", "type"]);
             const prodName = getProp(prod, ["name", "title"]);
-            const prodCat = getProp(prod, ["category", "cat"]);
-
             if (!prodName) return;
 
             const nameLower = prodName.toLowerCase();
 
             if (query === "") {
-                // If search is empty, filter strictly by current selected tab
                 let isMatchedTab = false;
                 if (currentTab === 'PREMIUM' && (sheetType === "Products Master Database" || sheetType === "Premium")) isMatchedTab = true;
                 if (currentTab === 'SERVICE' && sheetType === "Log in Service") isMatchedTab = true;
@@ -530,7 +527,7 @@
                     }
                 }
             } else {
-                // When searching, cross-search across ALL tabs using startsWith matching on product names only
+                // When searching, match across ALL tabs using startsWith
                 if (nameLower.startsWith(query)) {
                     if (!uniqueProductsMap.has(prodName)) {
                         uniqueProductsMap.set(prodName, prod);
@@ -560,7 +557,22 @@
                 <h3>${prodName}</h3>
                 <div class="card-footer-ornament">👑</div>
             `;
-            card.onclick = () => showVariants(prodName);
+            
+            // When a product card is clicked from search, automatically switch to its correct tab and show its variants
+            card.onclick = () => {
+                const sheetType = getProp(prod, ["sheet_type", "type"]);
+                let targetTab = 'PREMIUM';
+                if (sheetType === "Log in Service") targetTab = 'SERVICE';
+                else if (sheetType === "Game Items") targetTab = 'GAME';
+
+                currentTab = targetTab;
+                document.getElementById('tabPremium').classList.toggle('active', targetTab === 'PREMIUM');
+                document.getElementById('tabService').classList.toggle('active', targetTab === 'SERVICE');
+                document.getElementById('tabGame').classList.toggle('active', targetTab === 'GAME');
+
+                showVariants(prodName);
+            };
+
             container.appendChild(card);
             index++;
         });
@@ -691,7 +703,6 @@
             document.getElementById('searchInput').value = '';
             showVariants(lastSelectedProductName);
         } else if (currentView === 'VARIANTS') {
-            document.getElementById('searchInput').value = '`'; // small trick to reset view
             document.getElementById('searchInput').value = '';
             showProducts();
         }
