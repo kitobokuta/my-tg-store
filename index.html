@@ -316,8 +316,8 @@
         }
 
         .input-group { margin-top: 14px; text-align: left; }
-        .input-group label { font-size: 10px; color: var(--hint-color); display: block; margin-bottom: 4px; }
-        .input-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: #ffffff; box-sizing: border-box; font-size: 13px; outline: none; transition: border-color 0.2s ease; }
+        .input-group label { font-size: 10px; color: var(--hint-color); display: block; margin-bottom: 3px; }
+        .input-group input { width: 100%; padding: 9px 10px; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: #ffffff; box-sizing: border-box; font-size: 13px; outline: none; transition: border-color 0.2s ease; margin-bottom: 8px; }
         .input-group input:focus { border-color: #3b82f6; }
 
         .trust-footer {
@@ -399,8 +399,17 @@
     </div>
 
     <div id="inputForm" class="input-group">
-        <label for="accountData">Account ID / Email / Phone / Remarks:</label>
-        <input type="text" id="accountData" placeholder="ဝယ်ယူမည့် အကောင့်အချက်အလက်ထည့်ပါ...">
+        <label for="inputEmail">Email:</label>
+        <input type="text" id="inputEmail" placeholder="Email ထည့်ပါ...">
+
+        <label for="inputPassword">Password:</label>
+        <input type="text" id="inputPassword" placeholder="Password ထည့်ပါ...">
+
+        <label for="inputPhone">Phone Number:</label>
+        <input type="text" id="inputPhone" placeholder="Phone နံပါတ်ထည့်ပါ...">
+
+        <label for="inputRemark">Remark:</label>
+        <input type="text" id="inputRemark" placeholder="အခြားအချက်အလက်များ...">
     </div>
 </div>
 
@@ -427,6 +436,31 @@
     let currentView = 'PRODUCTS';
     let currentTab = 'PREMIUM';
     let lastSelectedProductName = '';
+
+    // --- Screen click event & Return key handler to dismiss keyboard ---
+    document.addEventListener('click', function(event) {
+        const searchInput = document.getElementById('searchInput');
+        const inputs = document.querySelectorAll('#inputForm input');
+        let isInput = event.target === searchInput;
+        inputs.forEach(inp => { if (event.target === inp) isInput = true; });
+        
+        if (!isInput) {
+            if (document.activeElement === searchInput) {
+                searchInput.blur();
+            }
+            inputs.forEach(inp => {
+                if (document.activeElement === inp) inp.blur();
+            });
+        }
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.keyCode === 13) {
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
+        }
+    });
 
     function getProp(obj, keys) {
         if (!obj) return "";
@@ -527,7 +561,6 @@
                     }
                 }
             } else {
-                // When searching, match across ALL tabs using startsWith
                 if (nameLower.startsWith(query)) {
                     if (!uniqueProductsMap.has(prodName)) {
                         uniqueProductsMap.set(prodName, prod);
@@ -558,7 +591,6 @@
                 <div class="card-footer-ornament">👑</div>
             `;
             
-            // When a product card is clicked from search, automatically switch to its correct tab and show its variants
             card.onclick = () => {
                 const sheetType = getProp(prod, ["sheet_type", "type"]);
                 let targetTab = 'PREMIUM';
@@ -656,6 +688,12 @@
         document.getElementById('categoryGrid').style.display = 'none';
         document.getElementById('detailView').style.display = 'block';
 
+        // ဝင်ရောက်လာတိုင်း input များကို ရှင်းလင်းပေးရန်
+        document.getElementById('inputEmail').value = '';
+        document.getElementById('inputPassword').value = '';
+        document.getElementById('inputPhone').value = '';
+        document.getElementById('inputRemark').value = '';
+
         const prodName = getProp(product, ["name", "title"]);
         const prodCat = getProp(product, ["category", "cat"]);
         const prodPrice = getProp(product, ["price", "cost"]);
@@ -711,7 +749,11 @@
     async function sendOrder() {
         if (!selectedProduct) return;
         
-        const userInput = document.getElementById('accountData').value;
+        const email = document.getElementById('inputEmail').value;
+        const password = document.getElementById('inputPassword').value;
+        const phone = document.getElementById('inputPhone').value;
+        const remark = document.getElementById('inputRemark').value;
+
         const prodName = getProp(selectedProduct, ["name", "title"]);
         const prodCat = getProp(selectedProduct, ["category", "cat"]);
         const prodPrice = getProp(selectedProduct, ["price", "cost"]);
@@ -725,35 +767,43 @@
 
         const captionText = `🛒 <b>Order ID:</b> <code>${orderId}</code>\n` +
                             `<b>Item:</b> ${fullItemName}\n` +
-                            `<b>Price:</b> ${prodPrice} MMK\n` +
-                            `<b>Account/Note:</b> ${userInput || '-'}\n\n` +
-                            `📷 <b>ငွေလွှဲပြေစာ နှင့်တကွ နောက်ဆုံး ဂဏန်း ၆ လုံးကို ပို့ပေးပါခဗျာ။</b>`;
+                            `<b>Price:</b> ${prodPrice} MMK\n\n` +
+                            `📧 <b>Email:</b> ${email || '-'}\n` +
+                            `🔑 <b>Password:</b> ${password || '-'}\n` +
+                            `📞 <b>Phone:</b> ${phone || '-'}\n` +
+                            `📝 <b>Remark:</b> ${remark || '-'}\n\n` +
+                            `📷 <b>ငွေလွှဲပြေစာ နှင့်တကွ နောက်ဆုံး ဂဏန်း ၆ လုံးကို ပို့ပေးပါခဗျာ။`;
 
-        if (chatId) {
-            try {
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'Application/json' },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        photo: QR_IMAGE_URL,
-                        caption: captionText,
-                        parse_mode: 'HTML'
-                    })
-                });
-            } catch (err){}
+        if (!chatId) {
+            alert("Telegram User ID မတွေ့ရှိပါ။ ကျေးဇူးပြု၍ Telegram App ထဲတွင် ပြန်လည်ကြိုးစားပါ။");
+            return;
         }
 
         try {
-            tg.sendData(JSON.stringify({
-                order_id: orderId,
-                full_item_name: fullItemName,
-                price: prodPrice,
-                customer_note: userInput || "-"
-            }));
-        } catch (e){}
+            tg.MainButton.showProgress();
+            const formData = new FormData();
+            formData.append('chat_id', chatId);
+            formData.append('photo', QR_IMAGE_URL);
+            formData.append('caption', captionText);
+            formData.append('parse_mode', 'HTML');
 
-        try { tg.close(); } catch(e){}
+            const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            tg.MainButton.hideProgress();
+
+            if (data.ok) {
+                tg.close();
+            } else {
+                alert("បញ្ជូនအော်ဒါမအောင်မြင်ပါ: " + (data.description || "Unknown error"));
+            }
+        } catch (err) {
+            tg.MainButton.hideProgress();
+            console.error(err);
+            alert("ချိတ်ဆက်မှု အမှားအယွင်းရှိနေပါသည်။ ကျေးဇူးပြု၍ ခဏနေမှ ထပ်ကြိုးစားပါ။");
+        }
     }
 
     fetchProducts();
